@@ -146,7 +146,7 @@ class MySQLDatabase:
         # INSERT INTO habits (habit_ID, habit_name, description, creation_date, user_ID, category_ID) VALUES (16, 'Stretching', 'Stretching', '2023-03-28 20:30:00', 5, 2);
         # INSERT INTO habits (habit_ID, habit_name, description, creation_date, user_ID, category_ID) VALUES (17, 'Meet Friends', 'Meet Friends', '2023-03-27 16:00:00', 4, 15);
         # INSERT INTO habits (habit_ID, habit_name, description, creation_date, user_ID, category_ID) VALUES (18, 'Smoking', 'Stop Smoking', '2023-03-10 00:00:00', 99, 8);
-        # INSERT INTO habits (habit_ID, habit_name, description, creation_date, user_ID, category_ID) VALUES (19, 'Alcohol', 'Don't drink Alcohol', '2023-03-10 00:00:00', 99, 8);
+        # INSERT INTO habits (habit_ID, habit_name, description, creation_date, user_ID, category_ID) VALUES (19, 'Alcohol', 'Dont drink Alcohol', '2023-03-10 00:00:00', 99, 8);
         # INSERT INTO habits (habit_ID, habit_name, description, creation_date, user_ID, category_ID) VALUES (20, 'Cinema', 'Cinema', '2023-03-26 15:00:00', 3, 3);
 
 
@@ -248,11 +248,16 @@ class MySQLDatabase:
         counter = 0
         for insert in inserts:
             try:
-                counter =+1
-                self.cursor.execute(insert)
-                print(f"Insert {counter} executed")
+                counter +=1
+                self.connect()
+                query = f"USE {database}; {insert}"
+                self.cursor.execute(query)
+                self.cursor.close()
+                print(f"Insert {counter} executed, {query}")
+                time.sleep(0.25)
             except Exception as e:
                 print("An error occurred:", e)
+
             
 
 
