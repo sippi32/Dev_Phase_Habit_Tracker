@@ -116,7 +116,7 @@ class login_screen(tk.Tk):
     def register(self):
         
         self.popup = tk.Toplevel()
-        self.popup.geometry("300x250")
+        self.popup.geometry("300x500")
         self.popup.title("Registration")
         self.popup.grab_set() # Disables interaction with parent window
 
