@@ -1273,12 +1273,19 @@ class main_screen(tk.Tk):
         # Loop through selected items and delete from database
         for item in selected_items:
             category_ID = tree.item(item)["values"][4]
-            print(category_ID)
-            # Use delete_category function from database class to delete selected category from the database
-            self.db.delete_category(category_ID)
+            sys_user_categories = self.db.get_user_categories(99)
             
-            # Refresh the habit table
-            self.update_categories_table(tree)
+            #Check if category is one of the sys users categories
+            if category_ID in [value[0] for value in sys_user_categories]:
+                messagebox.showerror("Error", "Can't delete a predefined sys user category")
+            else:
+                confirmation = messagebox.askyesno("Confirm deletion", "Do you really want to delete this category?")
+                if confirmation:
+                    # Use delete_category function from database class to delete selected category from the database
+                    self.db.delete_category(category_ID)
+                    # Refresh the habit table
+                    self.update_categories_table(tree)
+
 
     # Open window for adding new habit by user if pushing the Add Habit Button
     def add_category(self):

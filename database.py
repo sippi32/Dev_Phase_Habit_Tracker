@@ -1,5 +1,6 @@
 import mysql.connector
 import time
+from tkinter import messagebox
 
 class MySQLDatabase:
     def __init__(self, host, user, password, database = None):
@@ -13,14 +14,18 @@ class MySQLDatabase:
     
     # Connect to the MySQL database
     def connect(self):
-        self.connection = mysql.connector.connect(
+        try:
+            self.connection = mysql.connector.connect(
             host = self.host,
             user = self.user,
             password = self.password,
             database = self.database
-        )
+            )
+        except Exception as e: 
+            messagebox.showerror("Error","There is something wrong with your database credentials. Please check and try again.")
+            raise Exception("Failed to connect to MySQL database. Please check your credentials and try again.")
         self.cursor = self.connection.cursor()
-    
+
     # Disconnects from the database
     def disconnect(self):
         if self.connection is not None:
@@ -36,6 +41,7 @@ class MySQLDatabase:
         self.database = new_database
         if self.cursor.rowcount == 1:
             self.initialize_database(self.database) # Call database initialization function if a new database was created
+            messagebox.showinfo("Success", "Database created. You can go on and login/register.")
         self.disconnect()
 
     # Initializes creating all necessary tables and sample data

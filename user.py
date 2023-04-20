@@ -1,8 +1,8 @@
-import tkinter as tk
+# import tkinter as tk
 import datetime as dt
-import time
-from habit import Habit
-from database import MySQLDatabase 
+# import time
+# from habit import Habit
+
 
 
 class User:
@@ -36,15 +36,6 @@ class User:
         self.last_update = dt.datetime.now()
 
 
-    # def create_habit(self, habit_name, username, category_ID):
-    #     user_ID = self.db.get_userID(username)
-    #     description = "stop smoking"
-        
-    #     new_habit = Habit(habit_name, user_ID, category_ID, description )
-    #     #return new_habit
-    #     # Preparation of dictionary for insert_data function from MySQLDatabase class
-    #     data = {'habit_name': habit_name, 'user_ID': user_ID, 'category_ID': category_ID, 'description': description}     
-    #     self.db.insert_data("habits", data)
         
 
 
@@ -60,11 +51,6 @@ class User:
 
 
 
-# User.db = MySQLDatabase('localhost','root','Mannheim','marc')
-
-# existing_user = User.load_user("Sippenpit")
-
-# existing_user.create_habit("exercise", "Sippenpit", 1)
 
 
 
@@ -79,16 +65,3 @@ class User:
 
 
 
-
-# user1 = User("Marc","Fischer","Sippi","asd","asd@wqe.de",2342349234)
-# user2 = User("asdasd","Fischer","Sippi","asd","asd@wqe.de",23123123)
-# print(user1)
-# print(user2)
-
-# time.sleep(10)
-
-# user1.update_profile(new_first_name="Heinz")
-# user2.update_profile(new_email='f.marc.1991@web.de', new_phone_number= '122222222')
-
-# print(user1)
-# print(user2)
