@@ -13,8 +13,7 @@ class Habit:
     def __repr__(self):
         return f"({self.habit_name}, {self.user_ID}, {self.category_ID}, {self.creation_date}, {self.description})"       
         
-#new_habit = Habit("Rauchen", 1 , 2, description = "lalala")
-#print(repr(new_habit))   
+
         
         
 
