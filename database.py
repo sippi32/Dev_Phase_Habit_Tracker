@@ -56,15 +56,6 @@ class MySQLDatabase:
                         PRIMARY KEY (user_ID));
         COMMIT;"""
 
-        # INSERT INTO user_table (user_ID, first_name, last_name, username, password, email, phone_number, created_time, last_update) VALUES (1, 'Heinz', 'Huber', 'heinzi_09', 'hubinho', 'heinz.huber@web.de', '01768907654', '2023-03-15 10:00:00', '2023-03-20 11:05:00');
-        # INSERT INTO user_table (user_ID, first_name, last_name, username, password, email, phone_number, created_time, last_update) VALUES (2, 'Marc', 'Fischer', 'sippenpit', 'Hecht123', 'Fischer@gmx.de', '08971234567', '2023-03-25 15:00:00', '2023-03-25 15:00:00');
-        # INSERT INTO user_table (user_ID, first_name, last_name, username, password, email, phone_number, created_time, last_update) VALUES (3, 'Silke', 'Fuhrmann', 'Silke_23', 'Silke', 'Fuhrmi@web.de', '0872394592', '2023-03-26 15:00:00', '2023-03-27 15:00:00');
-        # INSERT INTO user_table (user_ID, first_name, last_name, username, password, email, phone_number, created_time, last_update) VALUES (4, 'Petra', 'Hinze', 'Petra_154', 'Petra', 'Petra-Hinze@email.de', '0128473920', '2023-03-27 16:00:00', '2023-03-28 16:00:00');
-        # INSERT INTO user_table (user_ID, first_name, last_name, username, password, email, phone_number, created_time, last_update) VALUES (5, 'Mata', 'Volk', 'Minze', '!rtz678', 'Volk-Mata@gmail.de', '0986272382', '2023-03-28 20:30:00', '2023-03-29 20:30:00');
-        # INSERT INTO user_table (user_ID, first_name, last_name, username, password, email, phone_number, created_time, last_update) VALUES (99, 'SYS', 'SYS', 'SYS', 'SYS', 'SYS', '0000000000', '2023-03-10 00:00:00', '2023-03-10 00:00:00');
-
-
-        
         self.query_monitoring_interval = f"""USE {database};
         START TRANSACTION;
         CREATE TABLE monitoring_interval(
@@ -73,13 +64,7 @@ class MySQLDatabase:
                         days INT,
                         PRIMARY KEY (interval_ID));
                 COMMIT;"""
-
-        # INSERT INTO monitoring_interval (interval_ID, control_interval, days) VALUES (1, 'daily', 1);
-        # INSERT INTO monitoring_interval (interval_ID, control_interval, days) VALUES (2, 'weekly', 7);
-        # INSERT INTO monitoring_interval (interval_ID, control_interval, days) VALUES (3, 'monthly', 30);
-
-
-        
+     
         self.query_category = f"""USE {database};
         START TRANSACTION;
         CREATE TABLE category(
@@ -92,25 +77,6 @@ class MySQLDatabase:
                         FOREIGN KEY (user_ID) REFERENCES user_table(user_ID)
                             ON UPDATE CASCADE ON DELETE CASCADE);
                 COMMIT;"""
-
-        # INSERT INTO category(category_name, description, creation_date, user_ID) VALUES ('Art', 'Art', '2023-03-10 00:00:00', 99);
-        # INSERT INTO category(category_name, description, creation_date, user_ID) VALUES ('Sport', 'Sport', '2023-03-10 00:00:00', 99);
-        # INSERT INTO category(category_name, description, creation_date, user_ID) VALUES ('Entertainment', 'Entertainment', '2023-03-10 00:00:00', 99);
-        # INSERT INTO category(category_name, description, creation_date, user_ID) VALUES ('Finance', 'Finance', '2023-03-10 00:00:00', 99);
-        # INSERT INTO category(category_name, description, creation_date, user_ID) VALUES ('Health', 'Health', '2023-03-10 00:00:00', 99);
-        # INSERT INTO category(category_name, description, creation_date, user_ID) VALUES ('Work', 'Work', '2023-03-10 00:00:00', 99);
-        # INSERT INTO category(category_name, description, creation_date, user_ID) VALUES ('Food', 'Food', '2023-03-10 00:00:00', 99);
-        # INSERT INTO category(category_name, description, creation_date, user_ID) VALUES ('Any', 'Any', '2023-03-10 00:00:00', 99);
-        # INSERT INTO category(category_name, description, creation_date, user_ID) VALUES ('Traveling', 'Traveling', '2023-03-15 10:00:00', 1);
-        # INSERT INTO category(category_name, description, creation_date, user_ID) VALUES ('Studying', 'Studying', '2023-03-15 10:00:00', 1);
-        # INSERT INTO category(category_name, description, creation_date, user_ID) VALUES ('Learning', 'Learning', '2023-03-25 15:00:00', 2);
-        # INSERT INTO category(category_name, description, creation_date, user_ID) VALUES ('Studying', 'Studying', '2023-03-25 15:00:00', 2);
-        # INSERT INTO category(category_name, description, creation_date, user_ID) VALUES ('Learning', 'Learning', '2023-03-26 15:00:00', 3);
-        # INSERT INTO category(category_name, description, creation_date, user_ID) VALUES ('Meditation', 'Meditation', '2023-03-27 16:00:00', 4);
-        # INSERT INTO category(category_name, description, creation_date, user_ID) VALUES ('Social', 'Social', '2023-03-27 16:00:00', 4);
-        # INSERT INTO category(category_name, description, creation_date, user_ID) VALUES ('Social', 'Social', '2023-03-28 20:30:00', 5);
-
-
 
         self.query_habits = f"""USE {database};
         START TRANSACTION;            
@@ -127,29 +93,6 @@ class MySQLDatabase:
                         FOREIGN KEY (category_ID) REFERENCES category(category_ID)
                             ON UPDATE CASCADE ON DELETE SET NULL);
                 COMMIT;"""
-
-        # INSERT INTO habits (habit_ID, habit_name, description, creation_date, user_ID, category_ID) VALUES (1, 'Drawing', 'Draw a picture', '2023-03-15 10:00:00', 1, 1);
-        # INSERT INTO habits (habit_ID, habit_name, description, creation_date, user_ID, category_ID) VALUES (2, 'Singing', 'Singing', '2023-03-25 15:00:00', 2, 1);
-        # INSERT INTO habits (habit_ID, habit_name, description, creation_date, user_ID, category_ID) VALUES (3, 'Reading', 'Reading', '2023-03-10 00:00:00', 99, 8);
-        # INSERT INTO habits (habit_ID, habit_name, description, creation_date, user_ID, category_ID) VALUES (4, 'Tennis', 'Tennis', '2023-03-27 16:00:00', 4, 2);
-        # INSERT INTO habits (habit_ID, habit_name, description, creation_date, user_ID, category_ID) VALUES (5, 'Soccer', 'Soccer', '2023-03-28 20:30:00', 5, 2);
-        # INSERT INTO habits (habit_ID, habit_name, description, creation_date, user_ID, category_ID) VALUES (6, 'Fitness', 'Fitness', '2023-03-10 00:00:00', 99, 2);
-        # INSERT INTO habits (habit_ID, habit_name, description, creation_date, user_ID, category_ID) VALUES (7, 'Newspaper', 'Newspaper', '2023-03-15 10:00:00', 1, 10);
-        # INSERT INTO habits (habit_ID, habit_name, description, creation_date, user_ID, category_ID) VALUES (8, 'Book', 'Book', '2023-03-28 20:30:00', 5, 10);
-        # INSERT INTO habits (habit_ID, habit_name, description, creation_date, user_ID, category_ID) VALUES (9, 'Check Portfolio', 'Check Portfolio', '2023-03-27 16:00:00', 4, 4);
-        # INSERT INTO habits (habit_ID, habit_name, description, creation_date, user_ID, category_ID) VALUES (10, 'Watch TV', 'Watch TV', '2023-03-27 16:00:00', 4, 3);
-        # INSERT INTO habits (habit_ID, habit_name, description, creation_date, user_ID, category_ID) VALUES (11, 'Learn Python', 'Learn Python', '2023-03-25 15:00:00', 2, 12);
-        # INSERT INTO habits (habit_ID, habit_name, description, creation_date, user_ID, category_ID) VALUES (12, 'Minigolf', 'Minigolf', '2023-03-26 15:00:00', 3, 2);
-        # INSERT INTO habits (habit_ID, habit_name, description, creation_date, user_ID, category_ID) VALUES (13, 'Math', 'Math', '2023-03-25 15:00:00', 2, 12);
-        # INSERT INTO habits (habit_ID, habit_name, description, creation_date, user_ID, category_ID) VALUES (14, 'Homeworkout', 'Homeworkout', '2023-03-10 00:00:00', 99, 2);
-        # INSERT INTO habits (habit_ID, habit_name, description, creation_date, user_ID, category_ID) VALUES (15, 'Yoga', 'Yoga', '2023-03-10 00:00:00', 99, 2);
-        # INSERT INTO habits (habit_ID, habit_name, description, creation_date, user_ID, category_ID) VALUES (16, 'Stretching', 'Stretching', '2023-03-28 20:30:00', 5, 2);
-        # INSERT INTO habits (habit_ID, habit_name, description, creation_date, user_ID, category_ID) VALUES (17, 'Meet Friends', 'Meet Friends', '2023-03-27 16:00:00', 4, 15);
-        # INSERT INTO habits (habit_ID, habit_name, description, creation_date, user_ID, category_ID) VALUES (18, 'Smoking', 'Stop Smoking', '2023-03-10 00:00:00', 99, 8);
-        # INSERT INTO habits (habit_ID, habit_name, description, creation_date, user_ID, category_ID) VALUES (19, 'Alcohol', 'Dont drink Alcohol', '2023-03-10 00:00:00', 99, 8);
-        # INSERT INTO habits (habit_ID, habit_name, description, creation_date, user_ID, category_ID) VALUES (20, 'Cinema', 'Cinema', '2023-03-26 15:00:00', 3, 3);
-
-
 
         self.query_active_user_habits = f"""USE {database};
         START TRANSACTION;    
@@ -174,31 +117,6 @@ class MySQLDatabase:
                             ON UPDATE CASCADE ON DELETE RESTRICT);
                 COMMIT;"""
                             
-        # INSERT INTO active_user_habits (active_habits_ID, starting_date, last_check, update_expiry, streak, status, goal_streak, end_date, user_ID, habit_ID, interval_ID) VALUES (1, '2023-03-15 11:00:00', '2023-03-19 11:00:00', '2023-03-20 11:00:00', 4, 'deleted', NULL, NULL, 1, 1, 1);
-        # INSERT INTO active_user_habits (active_habits_ID, starting_date, last_check, update_expiry, streak, status, goal_streak, end_date, user_ID, habit_ID, interval_ID) VALUES (2, '2023-04-10 11:00:00',NOW() , DATE_ADD(NOW(), INTERVAL 1 DAY), DATEDIFF(NOW(), '2023-04-10') + 1, 'in progress', NULL, NULL, 1, 14, 1);
-        # INSERT INTO active_user_habits (active_habits_ID, starting_date, last_check, update_expiry, streak, status, goal_streak, end_date, user_ID, habit_ID, interval_ID) VALUES (3, '2023-03-15 11:00:00', NOW(), DATE_ADD(NOW(), INTERVAL 1 DAY), DATEDIFF(NOW(), '2023-03-15') + 1, 'in progress', 60, NULL, 1, 18, 1);
-        # INSERT INTO active_user_habits (active_habits_ID, starting_date, last_check, update_expiry, streak, status, goal_streak, end_date, user_ID, habit_ID, interval_ID) VALUES (7, '2023-03-27 16:00:00', NOW(), DATE_ADD(NOW(), INTERVAL 1 DAY), DATEDIFF(NOW(), '2023-03-27') + 1, 'in progress', NULL, NULL, 2, 6, 1);
-        # INSERT INTO active_user_habits (active_habits_ID, starting_date, last_check, update_expiry, streak, status, goal_streak, end_date, user_ID, habit_ID, interval_ID) VALUES (8, '2023-03-28 20:30:00', NOW(), DATE_ADD(NOW(), INTERVAL 1 DAY), DATEDIFF(NOW(), '2023-03-28') + 1, 'in progress', 100, NULL, 2, 19, 1);
-        # INSERT INTO active_user_habits (active_habits_ID, starting_date, last_check, update_expiry, streak, status, goal_streak, end_date, user_ID, habit_ID, interval_ID) VALUES (11, '2023-03-26 15:00:00', NOW(), DATE_ADD(NOW(), INTERVAL 1 DAY), DATEDIFF(NOW(), '2023-03-26') + 1, 'in progress', NULL, NULL, 3, 13, 1);
-        # INSERT INTO active_user_habits (active_habits_ID, starting_date, last_check, update_expiry, streak, status, goal_streak, end_date, user_ID, habit_ID, interval_ID) VALUES (12, '2023-03-26 15:00:00', NOW(), DATE_ADD(NOW(), INTERVAL 1 DAY), DATEDIFF(NOW(), '2023-03-26') + 1, 'in progress', NULL, NULL, 3, 11, 1);
-        # INSERT INTO active_user_habits (active_habits_ID, starting_date, last_check, update_expiry, streak, status, goal_streak, end_date, user_ID, habit_ID, interval_ID) VALUES (13, '2023-03-27 16:00:00', NOW(), DATE_ADD(NOW(), INTERVAL 1 DAY), DATEDIFF(NOW(), '2023-03-27') + 1, 'in progress', NULL, NULL, 4, 13, 1);
-        # INSERT INTO active_user_habits (active_habits_ID, starting_date, last_check, update_expiry, streak, status, goal_streak, end_date, user_ID, habit_ID, interval_ID) VALUES (14, '2023-03-27 16:00:00', NOW(), DATE_ADD(NOW(), INTERVAL 1 DAY), DATEDIFF(NOW(), '2023-03-27') + 1, 'in progress', NULL, NULL, 4, 11, 1);
-        # INSERT INTO active_user_habits (active_habits_ID, starting_date, last_check, update_expiry, streak, status, goal_streak, end_date, user_ID, habit_ID, interval_ID) VALUES (16, '2023-03-27 16:00:00', NOW(), DATE_ADD(NOW(), INTERVAL 1 DAY), DATEDIFF(NOW(), '2023-03-27') + 1, 'in progress', NULL, NULL, 4, 10, 1);
-        # INSERT INTO active_user_habits (active_habits_ID, starting_date, last_check, update_expiry, streak, status, goal_streak, end_date, user_ID, habit_ID, interval_ID) VALUES (17, '2023-03-27 16:00:00', NOW(), DATE_ADD(NOW(), INTERVAL 1 DAY), DATEDIFF(NOW(), '2023-03-27') + 1, 'in progress', NULL, NULL, 4, 6, 1);
-        # INSERT INTO active_user_habits (active_habits_ID, starting_date, last_check, update_expiry, streak, status, goal_streak, end_date, user_ID, habit_ID, interval_ID) VALUES (4, '2023-03-16 11:00:00', NOW(), DATE_ADD(NOW(), INTERVAL 7 DAY), (DATEDIFF(NOW(), '2023-03-16') + 1) / 7, 'in progress', 40, NULL, 1, 15, 2);
-        # INSERT INTO active_user_habits (active_habits_ID, starting_date, last_check, update_expiry, streak, status, goal_streak, end_date, user_ID, habit_ID, interval_ID) VALUES (5, '2023-03-25 15:00:00', NOW(), DATE_ADD(NOW(), INTERVAL 7 DAY), (DATEDIFF(NOW(), '2023-03-25') + 1) / 7, 'in progress', 40, NULL, 2, 11, 2);
-        # INSERT INTO active_user_habits (active_habits_ID, starting_date, last_check, update_expiry, streak, status, goal_streak, end_date, user_ID, habit_ID, interval_ID) VALUES (6, '2023-03-26 15:00:00', NOW(), DATE_ADD(NOW(), INTERVAL 7 DAY), (DATEDIFF(NOW(), '2023-03-26') + 1) / 7, 'in progress', 50, NULL, 2, 13, 2);
-        # INSERT INTO active_user_habits (active_habits_ID, starting_date, last_check, update_expiry, streak, status, goal_streak, end_date, user_ID, habit_ID, interval_ID) VALUES (9, '2023-03-26 15:00:00', NOW(), DATE_ADD(NOW(), INTERVAL 7 DAY), (DATEDIFF(NOW(), '2023-03-26') + 1) / 7, 'in progress', 50, NULL, 3, 3, 2);
-        # INSERT INTO active_user_habits (active_habits_ID, starting_date, last_check, update_expiry, streak, status, goal_streak, end_date, user_ID, habit_ID, interval_ID) VALUES (10, '2023-03-26 15:00:00', NOW(), DATE_ADD(NOW(), INTERVAL 30 DAY), (DATEDIFF(NOW(), '2023-03-26') + 1) / 30, 'in progress', NULL, NULL, 3, 20, 3);
-        # INSERT INTO active_user_habits (active_habits_ID, starting_date, last_check, update_expiry, streak, status, goal_streak, end_date, user_ID, habit_ID, interval_ID) VALUES (15, '2023-03-27 16:00:00', NOW(), DATE_ADD(NOW(), INTERVAL 30 DAY), (DATEDIFF(NOW(), '2023-03-27') + 1) / 30, 'in progress', 50, NULL, 4, 9, 3);
-        # INSERT INTO active_user_habits (active_habits_ID, starting_date, last_check, update_expiry, streak, status, goal_streak, end_date, user_ID, habit_ID, interval_ID) VALUES (18, '2023-03-27 16:00:00', NOW(), DATE_ADD(NOW(), INTERVAL 30 DAY), (DATEDIFF(NOW(), '2023-03-27') + 1) / 30, 'in progress', 12, NULL, 1, 19, 3);
-        # INSERT INTO active_user_habits (active_habits_ID, starting_date, last_check, update_expiry, streak, status, goal_streak, end_date, user_ID, habit_ID, interval_ID) VALUES (19, '2023-03-27 16:00:00', NOW(), DATE_ADD(NOW(), INTERVAL 30 DAY), (DATEDIFF(NOW(), '2023-03-27') + 1) / 30, 'in progress', 12, NULL, 1, 6, 3);
-        # INSERT INTO active_user_habits (active_habits_ID, starting_date, last_check, update_expiry, streak, status, goal_streak, end_date, user_ID, habit_ID, interval_ID) VALUES (20, '2023-03-27 16:00:00', NOW(), DATE_ADD(NOW(), INTERVAL 30 DAY), (DATEDIFF(NOW(), '2023-03-27') + 1) / 30, 'in progress', 12, NULL, 2, 3, 3);
-        # INSERT INTO active_user_habits (active_habits_ID, starting_date, last_check, update_expiry, streak, status, goal_streak, end_date, user_ID, habit_ID, interval_ID) VALUES (21, '2023-03-27 16:00:00', NOW(), DATE_ADD(NOW(), INTERVAL 30 DAY), (DATEDIFF(NOW(), '2023-03-27') + 1) / 30, 'in progress', 12, NULL, 2, 18, 3);                            
-        
-
-
-
         # Execute the SQL statenments for initialising of the Database TABLES one after another    
         try:
             self.cursor.execute(self.query_user_table)
@@ -249,12 +167,21 @@ class MySQLDatabase:
         for insert in inserts:
             try:
                 counter +=1
+                #print("Connection before connect():", self.connection)
                 self.connect()
-                query = f"USE {database}; {insert}"
+                #print("Connection after connect():", self.connection)
+                query = insert
                 self.cursor.execute(query)
-                self.cursor.close()
+                self.connection.commit()
+                rows_affected = self.cursor.rowcount
+                if rows_affected == 0:
+                    print("No rows were inserted into the database.")
+                else:
+                    print(f"{rows_affected} rows were inserted into the database.")
+                #self.cursor.close()
+                #print(query)
                 print(f"Insert {counter} executed, {query}")
-                time.sleep(0.25)
+                time.sleep(0.15)
             except Exception as e:
                 print("An error occurred:", e)
 
@@ -649,7 +576,12 @@ class MySQLDatabase:
 
 
 
-# db = MySQLDatabase("localhost","root","Mannheim","helloworld")
+# db = MySQLDatabase("localhost","root","Mannheim","test")
+# db.connect()
+# insert = "INSERT INTO user_table (user_ID, first_name, last_name, username, password, email, phone_number, created_time, last_update) VALUES (1, 'Heinz', 'Huber', 'heinzi_09', 'hubinho', 'heinz.huber@web.de', '01768907654', '2023-03-15 10:00:00', '2023-03-20 11:05:00');"
+# db.cursor.execute(insert)
+# db.connection.commit()
+
 # #sys_habits = db.get_user_habits(99)
 # all_active = db.get_global_active_habits(3)
 # print(all_active)
@@ -668,13 +600,6 @@ class MySQLDatabase:
 
 
 
-#db.create_database('Marc')
-
-#db.check_value('user_table', 'username', 'asd')
-
-# db.connect()
-
-# db.disconnect()
   
 
     
@@ -683,23 +608,7 @@ class MySQLDatabase:
     
 
 
-# Define a new database connection object. This establishes the connection.
-#db = MySQLDatabase("localhost","root","Mannheim") 
-#db.create_table("Inka")
 
-
-#db.disconnect()
-
-
-
-# db.create_table('user', 'user_id INTEGER NOT NULL AUTO_INCREMENT', 'first_name VARCHAR(45) NOT NULL', ' last_name VARCHAR(45) NOT NULL', 'username VARCHAR(45) NOT NULL UNIQUE','password VARCHAR(10) NOT NULL','created_time TIMESTAMP','last_update TIMESTAMP','PRIMARY KEY (user_id)')
-
-# data = {'first_name': 'Marc', 'last_name': 'Fischer', 'username': 'Sippi', 'password':'asdas'}
-# #db.insert_data1('user', data)
-# data1 = {'first_name': 'Stefan'}
-# db.update_data('user',data1,'first_name = "Marc"')
-
-#print("Everything did well")
 
 
 
