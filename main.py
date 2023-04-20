@@ -298,10 +298,6 @@ class main_screen(tk.Tk):
         self.password = retrieved_vars [1]
         self.user_ID = self.db.get_userID(self.username)
 
-        # self.db = MySQLDatabase("localhost","root","Mannheim","marc")
-        # self.username = "Inkamaus"
-        # self.user_ID = self.db.get_userID(self.username)
-
         # Button for opening the MyHabits Screen where user can see and define own habits
         Button_1 = tk.Button(text="MyHabits",  width = 22, height=3, font = ("Arial",12, "bold"),command = self.open_myHabits)
         Button_1.place(x = 5, y = 60)
