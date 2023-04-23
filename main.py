@@ -15,11 +15,11 @@ from datetime import timedelta
 import pandas as pd
 import matplotlib.pyplot as plt
 
-''' Class for the first screen of the Habit Tracker. In this screen the user have to enter the database credentials 
-Host, User, Password and Database for the MySQL Database. The USer can either choose a existing Database or create a new Database.
-The function creates a database if it not already exists
-'''
 class database_connection_screen(tk.Tk):
+    """Class for the first screen of the Habit Tracker. In this screen the user have to enter the database credentials 
+    Host, User, Password and Database for the MySQL Database. The USer can either choose a existing Database or create a new Database.
+    The function creates a database if it not already exists
+    """
     def __init__(self):
         super().__init__()
         self.title("Database Connection")
@@ -61,7 +61,14 @@ class database_connection_screen(tk.Tk):
         self.confirm_button.pack()                      
     
     # Function for confrim button
-    def confirm_values(self): 
+    def confirm_values(self):
+        """ Function for handling the confirm button click in database_connection_screen.
+
+            At first the entries from the labels of the connection screen are get. Using the credentials an object of the MySQLDatabas class is created using the parameters host,user,password.
+            The create_database is then used to call the create_database function of the MySQLDatabase class. This function creates a new database with the database entry name if it not already exists.
+            After creating the database or not creating if it allready existed (second login) the connection is tested using try. If the connection was successfull the credentials of the database are stored
+            in an environmental variable for the use of the habit tracker. At the end of the function the database_connection window is destroyed and the window for the login screen is opened.
+        """
         host = self.entry_host.get()
         user = self.entry_user.get()
         password = self.entry_password.get()
@@ -72,17 +79,16 @@ class database_connection_screen(tk.Tk):
 
         try:
             db = mysql.connector.connect(host=host, user=user, password=password, database=database)
-            print("Connection successful!")
+            print("Connection successful!") # Test if database connection is successfull
         except mysql.connector.Error as err:
             print(f"Error connecting to database: {err}")
         finally:
             if db:
                 self.var_string = f"{host},{user},{password},{database}" # Concatenate database variables into a single string
                 os.environ["Database_Variables"] = self.var_string       # Set environment variable for later database connection
-                # print(os.getenv("Database_Variables"))
                 db.disconnect()
-                self.destroy()
-                self.open_next_window()
+                self.destroy() 
+                self.open_next_window() # Calls function for opening the Login Screen window
     
     # After successfully creating a new Database the next window (Login Screen) opens
     def open_next_window(self):
@@ -90,10 +96,11 @@ class database_connection_screen(tk.Tk):
         login_screen = login_screen()
         login_screen.mainloop()
 
-''' The Login Screen class contains the window for the user login. A user can either login to the habit tracker
-using username and password or create a new account using the registration button'''
 
 class login_screen(tk.Tk):  
+    """The Login Screen class contains the window for the user login. A user can either login to the habit tracker
+    using username and password or create a new account using the registration button
+    """
     def __init__(self):
         super().__init__()
         self.title("Login/Registration Habit Tracker")
@@ -174,9 +181,19 @@ class login_screen(tk.Tk):
         email = self.entry_email.get()
         phone_number = self.entry_phone_number.get()
         
-        # Check if any of the variables are empty
+        # Check if any of the variables are empty. If so user cannot register
         if not all([first_name, last_name, username, password, email, phone_number]):
             messagebox.showerror("Error", "Please fill in all fields")
+            return
+        
+        # Check if the phone number is an integer value. If not user cannot register.
+        if isinstance(phone_number, int):
+            messagebox.showerror("Error", "Phone number must be a number")
+            return        
+        
+        # Check if the email address contains a @. If not user cannot register.
+        if "@" not in email:
+            messagebox.showerror("Error", "Your email address doesn't contain a @")
             return
 
         # Use User class to create a new user instance

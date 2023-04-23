@@ -46,124 +46,25 @@ class MySQLDatabase:
 
     # Initializes creating all necessary tables and sample data
     def initialize_database(self,database):
-        self.query_user_table = f"""USE {database};
-        START TRANSACTION;
+        # Read the contents of the file that contains the SQL statements
+        with open('database_tables.txt', 'r') as f:
+            sql = f.read()
 
-        CREATE TABLE user_table(
-                        user_ID INTEGER NOT NULL AUTO_INCREMENT,
-                        first_name VARCHAR(45) NOT NULL,
-                        last_name VARCHAR(45) NOT NULL,
-                        username VARCHAR(45) NOT NULL UNIQUE,
-                        password VARCHAR(10) NOT NULL,
-                        email VARCHAR(40),
-                        phone_number VARCHAR(20),
-                        created_time TIMESTAMP NOT NULL,
-                        last_update TIMESTAMP,
-                        PRIMARY KEY (user_ID));
-        COMMIT;"""
+        # Split the SQL statements by the semicolon delimiter and remove any leading/trailing white space
+        statements = []
+        statements.append(f"USE {database};")
+        statements += [x.strip() for x in sql.split(';')]
 
-        self.query_monitoring_interval = f"""USE {database};
-        START TRANSACTION;
-        CREATE TABLE monitoring_interval(
-                        interval_ID INTEGER NOT NULL AUTO_INCREMENT,
-                        control_interval VARCHAR(45),
-                        days INT,
-                        PRIMARY KEY (interval_ID));
-                COMMIT;"""
-     
-        self.query_category = f"""USE {database};
-        START TRANSACTION;
-        CREATE TABLE category(
-                        category_ID INTEGER NOT NULL AUTO_INCREMENT,
-                        category_name VARCHAR(45) NOT NULL,
-                        description VARCHAR(100) NOT NULL,
-                        creation_date TIMESTAMP NOT NULL,
-                        user_ID INT NOT NULL,
-                        PRIMARY KEY (category_ID),
-                        FOREIGN KEY (user_ID) REFERENCES user_table(user_ID)
-                            ON UPDATE CASCADE ON DELETE CASCADE);
-                COMMIT;"""
-
-        self.query_habits = f"""USE {database};
-        START TRANSACTION;            
-        CREATE TABLE habits(
-                        habit_ID INTEGER NOT NULL AUTO_INCREMENT,
-                        habit_name VARCHAR(45) NOT NULL,
-                        description VARCHAR(100) NOT NULL,
-                        creation_date TIMESTAMP NOT NULL,
-                        user_ID INT NOT NULL,
-                        category_ID INT,
-                        PRIMARY KEY (habit_ID),
-                        FOREIGN KEY (user_ID) REFERENCES user_table(user_ID)
-                            ON UPDATE CASCADE ON DELETE CASCADE,
-                        FOREIGN KEY (category_ID) REFERENCES category(category_ID)
-                            ON UPDATE CASCADE ON DELETE SET NULL);
-                COMMIT;"""
-
-        self.query_active_user_habits = f"""USE {database};
-        START TRANSACTION;    
-        CREATE TABLE active_user_habits(
-                        active_habits_ID INTEGER NOT NULL AUTO_INCREMENT,
-                        starting_date TIMESTAMP NOT NULL,
-                        last_check TIMESTAMP,
-                        update_expiry TIMESTAMP NOT NULL,
-                        streak INT,
-                        status VARCHAR(45),
-                        goal_streak INT,
-                        end_date DATE,
-                        user_ID INT NOT NULL,
-                        habit_ID INT NOT NULL,
-                        interval_ID INT NOT NULL,
-                        PRIMARY KEY (active_habits_ID),
-                        FOREIGN KEY (user_ID) REFERENCES user_table(user_ID)
-                            ON UPDATE CASCADE ON DELETE CASCADE,
-                        FOREIGN KEY (habit_ID) REFERENCES habits(habit_ID)
-                            ON UPDATE CASCADE ON DELETE CASCADE,
-                        FOREIGN KEY (interval_ID) REFERENCES monitoring_interval(interval_ID)
-                            ON UPDATE CASCADE ON DELETE RESTRICT);
-                COMMIT;"""
-                            
-        # Execute the SQL statenments for initialising of the Database TABLES one after another    
-        try:
-            self.cursor.execute(self.query_user_table)
-            time.sleep(1)                  
-            self.cursor.close()
-            print("user_table created")
-        except Exception as e:
-            print("An error occurred:", e)
-        try:
-            self.connect()
-            self.cursor.execute(self.query_monitoring_interval)
-            time.sleep(1)          
-            self.cursor.close()
-            print("query_monitoring_interval created")
-        except Exception as e:
-            print("An error occurred:", e)
-        try:
-            self.connect()
-            self.cursor.execute(self.query_category)
-            time.sleep(1)
-            self.cursor.close()
-            print("query_category created")
-        except Exception as e:
-            print("An error occurred:", e)
-        try:
-            self.connect()
-            self.cursor.execute(self.query_habits)
-            time.sleep(1)
-            self.cursor.close()
-            print("query_habits created")
-        except Exception as e:
-            print("An error occurred:", e)
-        try:
-            self.connect()
-            self.cursor.execute(self.query_active_user_habits)
-            time.sleep(1) 
-            self.cursor.close()
-            print("query_active_user_habits created")
-        except Exception as e:
-            print("An error occurred:", e)
-
+        # Execute each SQL statement
+        for statement in statements:
+            #print(statement)
+            try:
+                self.cursor.execute(statement)
+                self.connection.commit()
+                print(f"Table created")
+            except Exception as e:
+                print(f"An error occurred while executing SQL statement: {statement}")
+                print(f"Error message: {str(e)}")
 
         # Insert all predefinded insert statements using the insert.txt file. First open txt file:
         with open('inserts.txt', 'r') as f:
@@ -190,8 +91,6 @@ class MySQLDatabase:
                 time.sleep(0.15)
             except Exception as e:
                 print("An error occurred:", e)
-
-            
 
 
     # Creates a new table in the database if its not already existing
@@ -329,8 +228,7 @@ class MySQLDatabase:
         query = """SELECT habits.habit_ID, habits.habit_name, habits.description, habits.creation_date, category.category_name
 	                    FROM habits  
                         INNER JOIN category ON habits.category_ID = category.category_ID
-                        WHERE habits.user_ID = %s OR habits.user_ID = 99;      
-                
+                        WHERE habits.user_ID = %s OR habits.user_ID = 99;                
                 """    
         cursor.execute(query, (user_ID,))
         habits = cursor.fetchall()
@@ -367,8 +265,7 @@ class MySQLDatabase:
 	                    FROM active_user_habits  
                         INNER JOIN habits ON active_user_habits.habit_ID = habits.habit_ID
                         INNER JOIN monitoring_interval ON active_user_habits.interval_ID = monitoring_interval.interval_ID
-                        WHERE active_user_habits.user_ID = %s AND active_user_habits.status != 'deleted';      
-                        COMMIT;
+                        WHERE active_user_habits.user_ID = %s AND active_user_habits.status != 'deleted';
                 """
         #print(query)    
         cursor.execute(query, (user_ID,))
@@ -388,8 +285,7 @@ class MySQLDatabase:
                         INNER JOIN monitoring_interval ON active_user_habits.interval_ID = monitoring_interval.interval_ID
                         INNER JOIN user_table ON active_user_habits.user_ID = user_table.user_ID
                         WHERE active_user_habits.interval_ID = {interval_ID}   
-                        ORDER BY active_user_habits.streak DESC;      
-                        COMMIT;
+                        ORDER BY active_user_habits.streak DESC;
                 """
         #print(query)    
         cursor.execute(query)
@@ -408,8 +304,7 @@ class MySQLDatabase:
                         INNER JOIN habits ON active_user_habits.habit_ID = habits.habit_ID
                         INNER JOIN monitoring_interval ON active_user_habits.interval_ID = monitoring_interval.interval_ID
                         WHERE active_user_habits.user_ID = %s
-                        ORDER BY active_user_habits.streak DESC;      
-                        COMMIT;
+                        ORDER BY active_user_habits.streak DESC;
                 """
         #print(query)    
         cursor.execute(query, (user_ID,))
@@ -426,7 +321,6 @@ class MySQLDatabase:
         # Query
         query = f""" SELECT active_habits_ID FROM active_user_habits
                     WHERE user_ID = {user_ID} AND habit_ID = {habit_ID} AND status = "{status}";
-                    COMMIT;
         """ 
         cursor.execute(query)
         active_habit_ID = cursor.fetchone()
@@ -472,7 +366,7 @@ class MySQLDatabase:
         query = f"""DELETE FROM habits WHERE habit_ID = {habit_ID};
                 COMMIT;"""
         #print(query)
-        cursor.execute(query)
+        cursor.execute(query,multi=True)
         cursor.close()
         self.connection.close()
 
@@ -498,8 +392,7 @@ class MySQLDatabase:
         #query = "SELECT * FROM habits WHERE user_ID = %s"
         query = """SELECT category.category_ID, category.category_name, category.description, category.creation_date
 	                    FROM category  
-                        WHERE category.user_ID = %s OR category.user_ID = 99;      
-                
+                        WHERE category.user_ID = %s OR category.user_ID = 99;
                 """    
         cursor.execute(query, (user_ID,))
         categories = cursor.fetchall()
@@ -552,8 +445,7 @@ class MySQLDatabase:
         self.connect()
         cursor = self.connection.cursor()
         # Query for deleting a category from the category table using the category_ID
-        query = f"""DELETE FROM category WHERE category_ID = {category_ID};
-                COMMIT;"""
+        query = f"""DELETE FROM category WHERE category_ID = {category_ID};"""
         #print(query)
         cursor.execute(query)
         cursor.close()
@@ -567,6 +459,27 @@ class MySQLDatabase:
         results = self.cursor.fetchone()
         self.connection.close()
         return results
+    
+    def create_database_tables(self,database):
+    # Read the contents of the file that contains the SQL statements
+        with open('database_tables.txt', 'r') as f:
+            sql = f.read()
+
+        # Split the SQL statements by the semicolon delimiter and remove any leading/trailing white space
+        statements = []
+        statements.append(f"USE {database};")
+        statements += [x.strip() for x in sql.split(';')]
+
+        # Execute each SQL statement
+        for statement in statements:
+            #print(statement)
+            try:
+                self.cursor.execute(statement)
+                self.connection.commit()
+                print(f"Table created")
+            except Exception as e:
+                print(f"An error occurred while executing SQL statement: {statement}")
+                print(f"Error message: {str(e)}")
 
     
 
@@ -582,10 +495,21 @@ class MySQLDatabase:
 
 
 
-# db = MySQLDatabase("localhost","root","Mannheim","test")
+# db = MySQLDatabase("localhost","root","Mannheim","lulu")
 # db.connect()
-# insert = "INSERT INTO user_table (user_ID, first_name, last_name, username, password, email, phone_number, created_time, last_update) VALUES (1, 'Heinz', 'Huber', 'heinzi_09', 'hubinho', 'heinz.huber@web.de', '01768907654', '2023-03-15 10:00:00', '2023-03-20 11:05:00');"
-# db.cursor.execute(insert)
+
+
+
+# db.create_database_tables("lulu")
+
+
+
+
+
+
+
+#insert = "INSERT INTO user_table (user_ID, first_name, last_name, username, password, email, phone_number, created_time, last_update) VALUES (67, 'Heinz', 'Huber', 'lui', 'hubinho', 'heinz.huber@web.de', '01768907654', '2023-03-15 10:00:00', '2023-03-20 11:05:00');"
+#db.cursor.execute(insert)
 # db.connection.commit()
 
 # #sys_habits = db.get_user_habits(99)
