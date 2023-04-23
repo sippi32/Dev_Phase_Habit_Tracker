@@ -88,7 +88,7 @@ class database_connection_screen(tk.Tk):
                 os.environ["Database_Variables"] = self.var_string       # Set environment variable for later database connection
                 db.disconnect()
                 self.destroy() 
-                self.open_next_window() # Calls function for opening the Login Screen window
+                self.open_next_window() # Calls function for opening the Login Screen window 
     
     # After successfully creating a new Database the next window (Login Screen) opens
     def open_next_window(self):
