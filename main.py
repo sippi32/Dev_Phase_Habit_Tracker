@@ -16,9 +16,23 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 class database_connection_screen(tk.Tk):
-    """Class for the first screen of the Habit Tracker. In this screen the user have to enter the database credentials 
-    Host, User, Password and Database for the MySQL Database. The USer can either choose a existing Database or create a new Database.
-    The function creates a database if it not already exists
+    """The first screen of the Habit Tracker where the user enters database credentials for MySQL Database.
+
+    Attributes:
+        welcome_label (tk.Label): A label welcoming the user to the screen.
+        host_label (tk.Label): A label indicating the 'Host' input field.
+        entry_host (tk.Entry): An input field for the user to enter the host of their MySQL database.
+        user_label (tk.Label): A label indicating the 'User' input field.
+        entry_user (tk.Entry): An input field for the user to enter the username of their MySQL database.
+        password_label (tk.Label): A label indicating the 'Password' input field.
+        entry_password (tk.Entry): An input field for the user to enter the password of their MySQL database.
+        database_label (tk.Label): A label indicating the 'Database' input field.
+        entry_database (tk.Entry): An input field for the user to enter the name of their MySQL database.
+        confirm_button (tk.Button): A button that triggers the `confirm_values` function.
+
+    Methods:
+        confirm_values: Validates the user's input values, creates the database if it doesn't already exist, and stores
+                        the credentials in an environmental variable for later use by the Habit Tracker.
     """
     def __init__(self):
         super().__init__()
@@ -62,13 +76,24 @@ class database_connection_screen(tk.Tk):
     
     # Function for confrim button
     def confirm_values(self):
-        """ Function for handling the confirm button click in database_connection_screen.
-
-            At first the entries from the labels of the connection screen are get. Using the credentials an object of the MySQLDatabas class is created using the parameters host,user,password.
-            The create_database is then used to call the create_database function of the MySQLDatabase class. This function creates a new database with the database entry name if it not already exists.
-            After creating the database or not creating if it allready existed (second login) the connection is tested using try. If the connection was successfull the credentials of the database are stored
-            in an environmental variable for the use of the habit tracker. At the end of the function the database_connection window is destroyed and the window for the login screen is opened.
         """
+        Handle the confirmation button click in the database connection screen.
+
+        Retrieve the values entered into the host, user, password, and database entry fields, and use them to create a new
+        MySQLDatabase object using the `host`, `user`, and `password` parameters. Call the `create_database` method of the
+        new object, which creates a new database with the name specified in the `database` entry field if it does not already
+        exist.
+
+        Test the database connection using a `try` block. If the connection is successful, store the database credentials in
+        an environmental variable for use in the habit tracker. Finally, close the database connection, destroy the current
+        window, and open the login screen.
+
+        Raises:
+            mysql.connector.Error: If there is an error connecting to the database.
+
+        Returns:
+            None
+        """  
         host = self.entry_host.get()
         user = self.entry_user.get()
         password = self.entry_password.get()
@@ -118,9 +143,11 @@ class login_screen(tk.Tk):
         tk.Label(text = "").pack()
         tk.Button(text = "Register", height = "2", width = "30", command = self.register).pack()
     
-
-    #function for opening a popup window where new users can create an account. The Button "Register" calls the function save_registration() which saves the input data in the database
     def register(self):
+        """
+        Opens a popup window where new users can create an account. The 'Register' button
+        calls the function save_registration() which saves the input data in the database.
+        """
         
         self.popup = tk.Toplevel()
         self.popup.geometry("300x500")
@@ -169,10 +196,12 @@ class login_screen(tk.Tk):
 
         tk.Button(self.popup, text="Register", command = self.save_registration, width=10, height=1).pack()
 
-        self.popup.wait_window() # Wait for popup window to be destroyed
+        self.popup.wait_window()  # Wait for popup window to be destroyed
 
-    # Function for storing the input user data in the database and closing the popup window
-    def save_registration(self):     
+    def save_registration(self):
+        """
+        Stores the input user data in the database and closes the popup window.
+        """ 
 
         first_name = self.entry_first_name.get()
         last_name = self.entry_last_name.get()
@@ -186,10 +215,10 @@ class login_screen(tk.Tk):
             messagebox.showerror("Error", "Please fill in all fields")
             return
         
-        # Check if the phone number is an integer value. If not user cannot register.
-        if isinstance(phone_number, int):
-            messagebox.showerror("Error", "Phone number must be a number")
-            return        
+        # Check if the phone number entered contains only numbers
+        if not phone_number.isnumeric():
+            messagebox.showerror("Error", "Phone number must contain only digits")
+            return      
         
         # Check if the email address contains a @. If not user cannot register.
         if "@" not in email:
@@ -212,9 +241,11 @@ class login_screen(tk.Tk):
             print("MySQL error: {}".format(e))
             self.popup.destroy()
                
-
-    # Function for opening a toplevel login screen where a user can enter username/password and confirm it with a login button
     def login(self):
+        """
+        Opens a toplevel login screen where a user can enter username and password, and confirm it with a login button.
+        If the login is successful, sets environment variables for the active user credentials and opens the main screen of the Habit Tracker.
+        """
         
         self.popup = tk.Toplevel()
         self.popup.geometry("300x250")
@@ -243,8 +274,12 @@ class login_screen(tk.Tk):
         # Wait for popup window to be destroyed     
         self.popup.wait_window()
 
-    # Function for the login button
+
     def login_process(self):
+        """
+        Processes the user inputs from the login screen, checks if the user exists in the database, and if so, sets environment variables for the active user credentials and opens the main screen of the Habit Tracker.
+        If the user inputs are incorrect, displays an error message.
+        """
         # Get the username and password from the user inputs
         username = self.entry_username.get()
         password = self.entry_password.get()
@@ -284,16 +319,28 @@ class login_screen(tk.Tk):
         main_screen = main_screen()
         main_screen.mainloop()
 
-'''The main screen class contains the main GUI for the habit tracker with all its functionalities.
-A user can:
-- Create/Delete Habits
-- Activate Habits for tracking and check off active habits during the given time interval
-- Create/Delete Categories
-- Analyze Streaks and fullfilments of targets
-- Update the profile information just like username, password, name, email, phone number
-- Compare streaks with global (all users) highscores 
-'''
-class main_screen(tk.Tk):  
+class main_screen(tk.Tk):
+    """A class representing the main screen of the habit tracker GUI, containing all its functionalities.
+    
+    Attributes:
+    - db: A MySQLDatabase object for connecting to the database
+    - username: A string representing the active user's username
+    - password: A string representing the active user's password
+    - user_ID: An integer representing the active user's ID in the database
+    
+    Methods:
+    - open_myHabits: Opens the MyHabits screen where the user can create and delete habits
+    - open_myCategories: Opens the MyCategories screen where the user can create and delete categories
+    - open_analyze_myhabits: Opens the Activate Habits screen where the user can set predefined habits to active
+    - update_profile: Opens the Update Profile screen where the user can update their profile information
+    - open_highscores: Opens the Highscores screen where the user can see their own and public streaks and highscores
+    - close_application: Closes the Habit Tracker application
+    - check_habit: Marks an active habit as completed and updates the table accordingly
+    - reactivate_active_habit: Reactivates an active habit where to user failed to check in time and updates the table accordingly
+    - delete_active_habit: Deletes an active habit and updates the table accordingly
+    - update_active_habits_table: Updates the table of active habits with current data from the database
+    - update_time: Updates the time label on the screen with the current time
+    """
     def __init__(self):
         super().__init__()
         self.title("Habit Tracker")
@@ -311,6 +358,7 @@ class main_screen(tk.Tk):
         # Split the string back into separate variables
         retrieved_vars = retrieved_var_string.split(",")
         
+        # Store the retrieved information about the current logged in user in the corresponding variables
         self.username = retrieved_vars[0]
         self.password = retrieved_vars [1]
         self.user_ID = self.db.get_userID(self.username)
@@ -344,15 +392,15 @@ class main_screen(tk.Tk):
         Button_8.place(x = 280, y = 350)
 
         # Button for reactivating a habit if the streak was lost.
-        Button_9 = tk.Button(text = "Reactivate Habit", font = ("Arial",8, "bold"), width = 15, height=2, command = self.reactivate_active_habit )
+        Button_9 = tk.Button(text = "Reactivate Habit", font = ("Arial",8, "bold"), width = 15, height=2, command = self.reactivate_active_habit)
         Button_9.place(x = 405, y = 350)
 
         # Button for deleting a active habit.
-        Button_10 = tk.Button(text = "Delete Active Habit", font = ("Arial",8, "bold"), width = 15, height=2, command = self.delete_active_habit )
+        Button_10 = tk.Button(text = "Delete Active Habit", font = ("Arial",8, "bold"), width = 15, height=2, command = self.delete_active_habit)
         Button_10.place(x = 525, y = 350)
 
         # Button for updating whole table.
-        Button_11 = tk.Button(text = "Update Table", font = ("Arial",8, "bold"), width = 15, height=2, command = self.update_active_habits_table )
+        Button_11 = tk.Button(text = "Update Table", font = ("Arial",8, "bold"), width = 15, height=2, command = self.update_active_habits_table)
         Button_11.place(x = 645, y = 350)
 
         # Create a label to show the current time on screen
@@ -375,23 +423,23 @@ class main_screen(tk.Tk):
         title_label.place(x=280, y=70)
        
         # Define Columns
-        self.active_habits_tree['columns'] = ("Habit Name","Streak", "Interval","Remaining Time","Deadline")
+        self.active_habits_tree['columns'] = ("Habit Name", "Streak", "Interval", "Remaining Time", "Deadline")
 
         # Format Columns
         self.active_habits_tree.column("#0", width=0, minwidth=0)
         self.active_habits_tree.column("Habit Name", anchor="w", width=80, minwidth=25)
         self.active_habits_tree.column("Streak", anchor="center", width=50,minwidth=25)
         self.active_habits_tree.column("Interval", anchor="w", width=80,minwidth=25)
-        self.active_habits_tree.column("Remaining Time", anchor="center", width=120,minwidth=25)
-        self.active_habits_tree.column("Deadline", anchor="w", width=150,minwidth=50)
+        self.active_habits_tree.column("Remaining Time", anchor="center", width=120, minwidth=25)
+        self.active_habits_tree.column("Deadline", anchor="w", width=150, minwidth=50)
         
         # Create Headings
-        self.active_habits_tree.heading("#0",text="",anchor="w") #Ghost column
-        self.active_habits_tree.heading("Habit Name",text="Habit Name", anchor="w")
-        self.active_habits_tree.heading("Streak",text="Streak",anchor="center")
-        self.active_habits_tree.heading("Interval",text="Interval",anchor="w")
-        self.active_habits_tree.heading("Remaining Time",text="Remaining Time",anchor="center")
-        self.active_habits_tree.heading("Deadline",text="Deadline",anchor="w")
+        self.active_habits_tree.heading("#0", text="", anchor="w") #Ghost column
+        self.active_habits_tree.heading("Habit Name", text="Habit Name", anchor="w")
+        self.active_habits_tree.heading("Streak", text="Streak", anchor="center")
+        self.active_habits_tree.heading("Interval", text="Interval", anchor="w")
+        self.active_habits_tree.heading("Remaining Time", text="Remaining Time", anchor="center")
+        self.active_habits_tree.heading("Deadline", text="Deadline", anchor="w")
 
 
         # Get active user habits from the database using user_ID
@@ -401,7 +449,7 @@ class main_screen(tk.Tk):
         for record in active_habits:
             # Calculate deadline
             self.last_check = record[4]  # Get last checkoff from database
-            self.monitoring_interval = record[6] # Get monitoring interval from database
+            self.monitoring_interval = record[6]  # Get monitoring interval from database
             
             # Get the active habits ID from database and store it in variable for db.update.data function if failed
             self.data = {'status': 'failed'}
@@ -409,7 +457,7 @@ class main_screen(tk.Tk):
             
             # Check if the stored monitoring interval is daily, weekly or monthly and calculate the remaining time for checkoff depending on the interval
             if self.monitoring_interval == "daily":
-                self.time_interval = timedelta(days = 2)
+                self.time_interval = timedelta(days=2)
                 # Calculate Deadline until user has to check off habit
                 # Get update_expiry from database
                 self.update_expiry = self.db.check_value("update_expiry","active_user_habits","active_habits_ID",self.active_habit_ID)
@@ -428,15 +476,15 @@ class main_screen(tk.Tk):
                 # if user fails to check off habit within timeframe the streak goes to zero
                 else:
                     formatted_remaining_time = "Time is up!"
-                    self.active_habits_tree.insert(parent="",index="end",iid=counter,text ="", values=(record[1],record[5],record[6],formatted_remaining_time,self.deadline))
+                    self.active_habits_tree.insert(parent="", index="end", iid=counter,text ="", values=(record[1], record[5], record[6], formatted_remaining_time,self.deadline))
                     # Set status in active_habits_table to "failed"
-                    self.db.update_data("active_user_habits",self.data,"active_habits",self.active_habit_ID)
+                    self.db.update_data("active_user_habits", self.data,"active_habits", self.active_habit_ID)
                     counter += 1
             elif self.monitoring_interval == "weekly":
-                self.time_interval = timedelta(days = 7)
+                self.time_interval = timedelta(days=7)
                 # Calculate Deadline until user has to check off habit
-                self.update_expiry = self.db.check_value("update_expiry","active_user_habits","active_habits_ID",self.active_habit_ID)
-                self.deadline = self.update_expiry[0][0] # Extracts the datetime object from list
+                self.update_expiry = self.db.check_value("update_expiry", "active_user_habits","active_habits_ID", self.active_habit_ID)
+                self.deadline = self.update_expiry[0][0]  # Extracts the datetime object from list
                 # Calculate Countdown
                 self.remaining_time = self.deadline - dt.now()
                 self.remaining_timedelta = timedelta(seconds=self.remaining_time.seconds)
@@ -447,20 +495,20 @@ class main_screen(tk.Tk):
                 # Format Countdown
                 formatted_remaining_time = f"{remaining_days}d {remaining_hours:02d}:{remaining_minutes:02d}:{remaining_seconds:02d}"
                 if self.remaining_time.total_seconds() > 0:    
-                    self.active_habits_tree.insert(parent="",index="end",iid=counter,text ="", values=(record[1],record[5],record[6],formatted_remaining_time,self.deadline))
+                    self.active_habits_tree.insert(parent="", index="end", iid=counter,text ="", values=(record[1], record[5], record[6], formatted_remaining_time, self.deadline))
                     counter += 1
                 else:
                     formatted_remaining_time = "Time is up!"
-                    self.active_habits_tree.insert(parent="",index="end",iid=counter,text ="", values=(record[1],record[5],record[6],formatted_remaining_time,self.deadline))
+                    self.active_habits_tree.insert(parent="",index="end", iid=counter,text ="", values=(record[1], record[5], record[6], formatted_remaining_time, self.deadline))
                     # Set status in active_habits_table to "failed"
-                    self.db.update_data("active_user_habits",self.data,"active_habits",self.active_habit_ID)
+                    self.db.update_data("active_user_habits", self.data,"active_habits", self.active_habit_ID)
                     counter +=1
             # If the monitoring isn't daily or weekly it has to be monthly
             else:
                 self.time_interval = timedelta(days = 30)
                 # Calculate Deadline until user has to check off habit
-                self.update_expiry = self.db.check_value("update_expiry","active_user_habits","active_habits_ID",self.active_habit_ID)
-                self.deadline = self.update_expiry[0][0] # Extracts the datetime object from list
+                self.update_expiry = self.db.check_value("update_expiry","active_user_habits","active_habits_ID", self.active_habit_ID)
+                self.deadline = self.update_expiry[0][0]  # Extracts the datetime object from list
                 # Calculate Countdown
                 self.remaining_time = self.deadline - dt.now()
                 self.remaining_timedelta = timedelta(seconds=self.remaining_time.seconds)
@@ -471,24 +519,37 @@ class main_screen(tk.Tk):
                 # Format Countdown
                 formatted_remaining_time = f"{remaining_days}d {remaining_hours:02d}:{remaining_minutes:02d}:{remaining_seconds:02d}"
                 if self.remaining_time.total_seconds() > 0:      
-                    self.active_habits_tree.insert(parent="",index="end",iid=counter,text ="", values=(record[1],record[5],record[6],formatted_remaining_time,self.deadline))
+                    self.active_habits_tree.insert(parent="", index="end", iid=counter,text ="", values=(record[1], record[5], record[6], formatted_remaining_time, self.deadline))
                     counter += 1
                 else:
                     formatted_remaining_time = "Time is up!"
-                    self.active_habits_tree.insert(parent="",index="end",iid=counter,text ="", values=(record[1],record[5],record[6],formatted_remaining_time,self.deadline))
+                    self.active_habits_tree.insert(parent="", index="end", iid=counter,text ="", values=(record[1], record[5], record[6], formatted_remaining_time, self.deadline))
                     # Set status in active_habits_table to "failed"
-                    self.db.update_data("active_user_habits",self.data,"active_habits",self.active_habit_ID)
+                    self.db.update_data("active_user_habits", self.data,"active_habits", self.active_habit_ID)
                     counter +=1
 
         # Schedule another call to the update_active_habits_tree function after every second
         self.after(1000, self.update_active_habits_tree)
 
-    
-    # Function to update the treeview with the active user habits every x seconds
     def update_active_habits_tree(self):
+        """Updates the active user habits treeview, displaying the time remaining until the next checkoff deadline
+        and updating the status of any habits that have not been checked off within the deadline.
+
+        The function retrieves the active habits for the current user from the database and calculates the remaining time until
+        the next checkoff deadline for each habit, based on the monitoring interval specified for that habit (daily, weekly, or monthly).
+        If the remaining time is positive, the function updates the corresponding row in the treeview to display the time remaining in
+        days, hours, minutes, and seconds. If the remaining time is negative, the function updates the corresponding row in the treeview
+        to display "Time is up!" and updates the status of the habit to "failed" in the active_habits_table in the database.
+
+        The function is called repeatedly using the tkinter after method, causing the treeview to be updated every x seconds.
+
+        Args:
+            self: The tkinter object.
+
+        Returns:
+            None.
         """
-        Updates the treeview and schedules another call to this function after 1 second
-        """
+
         # Populate the treeview with data
 
         # Get active user habits from the database using user_ID
@@ -584,8 +645,15 @@ class main_screen(tk.Tk):
         # Schedule another call to this function after every second
         self.after(1000, self.update_active_habits_tree)
 
-    # Function doesnt really delete the active_habit in the database. It just updates the column status to "deleted" so it isnt shown in the active_habits tree anymore
     def delete_active_habit(self):
+        """
+        Deletes the selected active habit from the database by updating its status to 'deleted'.
+        This function does not delete the active habit entirely from the database, but instead marks it as deleted,
+        so that it will not be displayed in the active habits tree anymore.
+
+        Returns:
+        None.
+        """
         # Get selected items
         selected_items = self.active_habits_tree.selection()
 
@@ -603,6 +671,21 @@ class main_screen(tk.Tk):
             messagebox.showinfo("Success","Habit not active any longer. Please update table.")
 
     def update_active_habits_table(self):
+        """Updates the active habits treeview with the current user's active habits.
+
+        Clears the treeview, retrieves the user's active habits from the database,
+        and calculates the deadline for each habit based on its monitoring interval.
+        If the user has not checked off the habit within the monitoring interval, the
+        habit's status is set to 'failed' in the database and its streak is reset to 0.
+        The active habits treeview displays the habit name, monitoring interval, remaining
+        time until the next checkoff deadline, and the deadline itself.
+
+        Args:
+            self (object): The class instance.
+
+        Returns:
+            None
+        """
 
         # Clear the treeview
         self.active_habits_tree.delete(*self.active_habits_tree.get_children())
@@ -649,7 +732,7 @@ class main_screen(tk.Tk):
                 self.time_interval = timedelta(days = 7)
                 # Calculate Deadline until user has to check off habit
                 self.update_expiry = self.db.check_value("update_expiry","active_user_habits","active_habits_ID",self.active_habit_ID)
-                self.deadline = self.update_expiry[0][0] # Extracts the datetime object from list
+                self.deadline = self.update_expiry[0][0]  # Extracts the datetime object from list
                 # Calculate Countdown
                 self.remaining_time = self.deadline - dt.now()
                 self.remaining_timedelta = timedelta(seconds=self.remaining_time.seconds)
@@ -698,9 +781,17 @@ class main_screen(tk.Tk):
 
 
     def reactivate_active_habit(self):
-        '''Reactivate a habit with a dead streak. In the database the active habit has to be set to 'deleted' and and 
+        """
+        Reactivate a habit with a dead streak. In the database the active habit has to be set to 'deleted' and and 
         a new entry has to be made with streak = 0. So the user has this "lost streak" saved for later analysis.
-        starting_date has to be now. Interval stays the same as before.'''
+        starting_date has to be now. Interval stays the same as before.
+        
+        Args:
+        self (object): The object itself.
+        
+        Returns:
+        None. 
+        """
 
         # Get selected items
         selected_items = self.active_habits_tree.selection()
@@ -711,7 +802,6 @@ class main_screen(tk.Tk):
             user_ID = self.user_ID
             habit_ID =  self.db.get_habit_ID(user_ID, active_habit_name)
 
-            
             # Get the monitoring interval of the habit
             interval_ID = self.active_habits_tree.item(item)["values"][2]
             # convert the interval_ID from a string to a integer:
@@ -727,7 +817,7 @@ class main_screen(tk.Tk):
             # If the user fails to track the habit the staus is set to 'Time is up!' In this case the user can reactivate the habit. 
             if status == 'Time is up!':
                
-                # Set status for old active user habit to deleted
+                # Update status for old active user habit from failed to deleted
                 query = f"""UPDATE active_user_habits
                             INNER JOIN habits ON active_user_habits.habit_ID = habits.habit_ID
                             SET status = 'deleted'
@@ -771,13 +861,13 @@ class main_screen(tk.Tk):
             
             print("done")
 
-    '''This Function is used for the Check Habbit button on the main_screen. If a user checks/tracks a habit the following should happen:
-    1. The streak is set streak +=1 and stored in db
-    2. The last_check attribute is updated to now.
-    3. The update_expiry attribute is updated depending on the time_interval
-
-    '''
     def check_habit(self):
+        """
+        This Function is used for the Check Habbit button on the main_screen. If a user checks/tracks a habit the following should happen:
+        1. The streak is set streak +=1 and stored in db
+        2. The last_check attribute is updated to now.
+        3. The update_expiry attribute is updated depending on the time_interval
+        """
         # Get selected items
         selected_items = self.active_habits_tree.selection()
 
@@ -886,20 +976,32 @@ class main_screen(tk.Tk):
             else:
                 messagebox.showerror("Error","There is something wrong with the Interval")
 
-    # Define a function to update the time label on the bottom of the screen
     def update_time(self):
+        """Function to update the time label on the bottom of the screen.
+
+        This function gets the current time and sets the text of the time label to it.
+        It uses the after() method to call itself every second, effectively updating the label in real-time.
+        """
         self.current_time = dt.now().strftime('%H:%M:%S')
         self.time_label.configure(text=self.current_time)
         self.time_label.after(1000, self.update_time)  # Update every second
     
-    # Close application with exit button
     def close_application(self):
+        """Function to close the Habit Tracker application.
+
+        This function prompts the user with a confirmation message before closing the application.
+        If the user confirms, the function destroys the main window and exits the application.
+        """
         confirm_exit = messagebox.askyesno("Confirm Exit", "Do you really want to leave the Habit Tracker?")
         if confirm_exit:
             self.destroy() # Close the main window and exit the application
-
-    # Function for the MyHabits button. 
+ 
     def open_myHabits(self):
+        """
+        Creates a new popup window that displays a table of the user's habits. 
+        Adds several buttons to interact with the habits, including adding a new habit, 
+        deleting a habit, updating the habit table, and activating a selected habit.
+        """
         # Create a new window
         popup = tk.Toplevel(self)
         popup.title("MyHabits")
@@ -936,7 +1038,6 @@ class main_screen(tk.Tk):
                 counter += 1
                 item = tree.insert("","end",values = (counter, habit[1], habit[2], habit[3], habit[4], habit[0], ""))
 
-
         # Create a frame for the buttons
         button_frame = tk.Frame(popup)
         button_frame.pack(pady=10)
@@ -962,6 +1063,15 @@ class main_screen(tk.Tk):
     
     # When pushing the Update Table button the screen gets updated with the newest habits
     def update_habits_table(self, tree):
+        """
+        Update the habit table displayed in the MyHabits popup window with the latest data from the database.
+
+        Args:
+            tree (ttk.Treeview): The treeview widget displaying the habit table.
+
+        Returns:
+            None
+        """
         # Refresh the habit table by getting the latest data from the database
         habits = self.db.get_user_habits(self.user_ID)
         
@@ -977,8 +1087,15 @@ class main_screen(tk.Tk):
         # Reset the counter variable to 0
         counter = 0
 
-
     def delete_habits(self, tree):
+        """Delete the selected habit and its corresponding records from the active_user_habits table.
+
+        Args:
+            tree (ttk.Treeview): The treeview widget that displays the habit table.
+
+        Returns:
+            None.
+        """
         # Get selected items
         selected_items = tree.selection()
 
@@ -1002,44 +1119,57 @@ class main_screen(tk.Tk):
 
     # Open window for adding new habit by user if pushing the Add Habit Button
     def add_habit(self):
-            
-            self.popup = tk.Toplevel(self)
-            self.popup.geometry("300x250")
-            self.popup.title("Add Habits to MyHabits")
-            self.popup.grab_set() # Disables interaction with parent window
+        """
+        Opens a pop-up window for the user to add a new habit to their account.
+        The window includes fields for entering the habit name, description, and category.
+        If the user successfully saves the habit, the habit is added to the database and the habit table is refreshed.
+        """
+               
+        self.popup = tk.Toplevel(self)
+        self.popup.geometry("300x250")
+        self.popup.title("Add Habits to MyHabits")
+        self.popup.grab_set() # Disables interaction with parent window
 
-            self.login_label = tk.Label(self.popup, text="Please enter habit below:")
-            self.login_label.pack()
-            tk.Label(self.popup, text="").pack()
+        self.login_label = tk.Label(self.popup, text="Please enter habit below:")
+        self.login_label.pack()
+        tk.Label(self.popup, text="").pack()
 
-            # Create Label and Entry for habit_name
-            self.habit_name_label = tk.Label(self.popup, text="Habit Name")
-            self.habit_name_label.pack()
-            self.entry_habit_name = tk.Entry(self.popup)
-            self.entry_habit_name.pack()
+        # Create Label and Entry for habit_name
+        self.habit_name_label = tk.Label(self.popup, text="Habit Name")
+        self.habit_name_label.pack()
+        self.entry_habit_name = tk.Entry(self.popup)
+        self.entry_habit_name.pack()
 
-            # Create Label and Entry for description
-            self.description_label = tk.Label(self.popup, text="Description")
-            self.description_label.pack()
-            self.entry_description = tk.Entry(self.popup)
-            self.entry_description.pack()
+        # Create Label and Entry for description
+        self.description_label = tk.Label(self.popup, text="Description")
+        self.description_label.pack()
+        self.entry_description = tk.Entry(self.popup)
+        self.entry_description.pack()
 
-            # Create Label and Dropdown menu for category
-            self.category_label = tk.Label(self.popup, text="Category")
-            self.category_label.pack()
-            self.category_var = tk.StringVar()
-            self.entry_category = ttk.Combobox(self.popup, textvariable=self.category_var, state="readonly")
-            self.entry_category.pack()
-            categories = self.db.get_user_categories_name(self.user_ID) # get list of available categories from database
-            self.entry_category['values'] = categories
-    
+        # Create Label and Dropdown menu for category
+        self.category_label = tk.Label(self.popup, text="Category")
+        self.category_label.pack()
+        self.category_var = tk.StringVar()
+        self.entry_category = ttk.Combobox(self.popup, textvariable=self.category_var, state="readonly")
+        self.entry_category.pack()
+        categories = self.db.get_user_categories_name(self.user_ID) # get list of available categories from database
+        self.entry_category['values'] = categories
 
-            tk.Button(self.popup, text="Save new myHabit", command = self.save_habit, width=20, height=1).pack()
 
-            self.popup.wait_window() # Wait for popup window to be destroyed
+        tk.Button(self.popup, text="Save new myHabit", command = self.save_habit, width=20, height=1).pack()
+
+        self.popup.wait_window()  # Wait for popup window to be destroyed
 
     # Function for storing the input user data in the database and closing the popup window
-    def save_habit(self):     
+    def save_habit(self):
+        """
+        Saves the habit entered by the user in the add_habit window to the database.
+        The function retrieves the habit name, description, and category from the entries in the window.
+        If any of the fields are empty, an error message is displayed.
+        If the user already has a habit with the same name stored in the database, an error message is displayed.
+        If there is already a system habit with the same name in the database, an error message is displayed.
+        If everything is correct, the habit is saved to the database and a success message is displayed.
+        """
 
         habit_name = self.entry_habit_name.get()
         description = self.entry_description.get()
@@ -1084,8 +1214,17 @@ class main_screen(tk.Tk):
             print("MySQL error: {}".format(e))
             self.popup.destroy()
 
-    # Function for setting a saved habit active for habit tracking. User can mark a habit and then click activate. A window pops up where the user can choose the control interval.
     def activate_habit(self, tree):
+        """Creates a popup window to activate a habit selected in a treeview widget.
+        User has to select the control interval and optional streak targets or
+        an ending date.
+        
+        Args:
+        tree: A tkinter ttk.Treeview widget containing the habits to activate.
+        
+        Returns:
+        None
+        """
         # Get selected item
         selected_items = tree.selection()
 
@@ -1135,6 +1274,20 @@ class main_screen(tk.Tk):
 
         # Create save button
         def save_activation(self):
+            """
+            Activates a user's habit for tracking and saves it to the database.
+
+            Reads the user's input for the habit activation form (control interval,
+            goal streak, and end date) and converts it to the appropriate data types.
+            Checks if the chosen end date is not in the past, and if the habit is not
+            already active for the user. If the checks pass, creates a new instance of
+            ActiveUserHabit with the provided data, calculates the update expiry time
+            based on the control interval, and inserts the new habit into the
+            active_user_habits table in the database using the db.insert_data function.
+
+            Returns:
+                None.
+            """
             # Use the dictionary to get the corresponding Interval_ID for the database table monitoring_interval
             self.interval_options = {"daily" : 1,"weekly" : 2,"monthly": 3}
             self.interval_ID = self.interval_options[control_interval_var.get()]
@@ -1202,11 +1355,14 @@ class main_screen(tk.Tk):
 
         save_button = tk.Button(popup_window, text='Save', command=lambda: save_activation(self))
         save_button.grid(column=0, row=3, pady=10, padx=10, columnspan=2)
-
-
         
-# Function for the MyHabits button. 
     def open_myCategories(self):
+        """
+        Opens a new window displaying all the categories of the current user, along with options to add, delete, and update categories.
+
+        Returns:
+        None
+        """
         # Create a new window
         cat_popup = tk.Toplevel(self)
         cat_popup.title("MyCategories")
@@ -1242,7 +1398,6 @@ class main_screen(tk.Tk):
                 counter += 1
                 item = tree.insert("","end",values = (counter, category[1], category[2], category[3], category[0], ""))
 
-
         # Create a frame for the buttons
         button_frame = tk.Frame(cat_popup)
         button_frame.pack(pady=10)
@@ -1259,9 +1414,13 @@ class main_screen(tk.Tk):
         update_button = tk.Button(button_frame, text="Update Table", command = lambda: self.update_categories_table(tree))
         update_button.pack(side="left", padx=5)
 
-    
-    # When pushing the Update Table button the screen gets updated with the newest categories
     def update_categories_table(self, tree):
+        """
+        Updates the category table with the latest data from the database.
+
+        Args:
+            tree (ttk.Treeview): The treeview widget displaying the categories.
+        """
         # Refresh the category table by getting the latest data from the database
         categories = self.db.get_user_categories(self.user_ID)
         
@@ -1280,6 +1439,13 @@ class main_screen(tk.Tk):
     
     # Function for the delete button
     def delete_category(self, tree):
+        """
+        Deletes the selected category from the database and updates the category table using delete_category function
+        from MySQLDatabase class.
+
+        Args:
+            tree (ttk.Treeview): The treeview widget displaying the categories.
+        """
         # Get selected items
         selected_items = tree.selection()
 
@@ -1299,38 +1465,44 @@ class main_screen(tk.Tk):
                     # Refresh the habit table
                     self.update_categories_table(tree)
 
-
-    # Open window for adding new habit by user if pushing the Add Habit Button
     def add_category(self):
-            self.add_cat_pop = tk.Toplevel()
-            self.add_cat_pop.geometry("300x250")
-            self.add_cat_pop.title("Add Categories to MyCategories")
-            self.add_cat_pop.grab_set() # Disables interaction with parent window
+        """
+        Open a popup window for the user to add a new category to their list.
+        Uses save_category function to store new category in database when clicking
+        the respective button.        
+        """
 
-            self.login_label = tk.Label(self.add_cat_pop, text="Please enter category below:")
-            self.login_label.pack()
-            tk.Label(self.add_cat_pop, text="").pack()
+        self.add_cat_pop = tk.Toplevel()
+        self.add_cat_pop.geometry("300x250")
+        self.add_cat_pop.title("Add Categories to MyCategories")
+        self.add_cat_pop.grab_set() # Disables interaction with parent window
 
-            # Create Label and Entry for category_name
-            self.category_name_label = tk.Label(self.add_cat_pop, text="Category Name")
-            self.category_name_label.pack()
-            self.entry_category_name = tk.Entry(self.add_cat_pop)
-            self.entry_category_name.pack()
+        self.login_label = tk.Label(self.add_cat_pop, text="Please enter category below:")
+        self.login_label.pack()
+        tk.Label(self.add_cat_pop, text="").pack()
 
-            # Create Label and Entry for description
-            self.description_label = tk.Label(self.add_cat_pop, text="Description")
-            self.description_label.pack()
-            self.entry_description = tk.Entry(self.add_cat_pop)
-            self.entry_description.pack()
-    
+        # Create Label and Entry for category_name
+        self.category_name_label = tk.Label(self.add_cat_pop, text="Category Name")
+        self.category_name_label.pack()
+        self.entry_category_name = tk.Entry(self.add_cat_pop)
+        self.entry_category_name.pack()
 
-            tk.Button(self.add_cat_pop, text="Save new myCategory", command = self.save_category, width=20, height=1).pack()
+        # Create Label and Entry for description
+        self.description_label = tk.Label(self.add_cat_pop, text="Description")
+        self.description_label.pack()
+        self.entry_description = tk.Entry(self.add_cat_pop)
+        self.entry_description.pack()
 
-            self.add_cat_pop.wait_window() # Wait for popup window to be destroyed
+        tk.Button(self.add_cat_pop, text="Save new myCategory", command = self.save_category, width=20, height=1).pack()
 
-    # Function for storing the input user data in the database and closing the popup window
+        self.add_cat_pop.wait_window() # Wait for popup window to be destroyed
+
+
     def save_category(self):     
-
+        """
+        Save the new category entered by the user to the database using insert_data function
+        from MySQLDatabase class and destroyes popup window after finishing successfully.
+        """
         category_name = self.entry_category_name.get()
         description = self.entry_description.get()
         user_ID = self.user_ID
@@ -1354,10 +1526,16 @@ class main_screen(tk.Tk):
             messagebox.showerror("Error", "An error occurred: {}".format(str(e)))
             print("MySQL error: {}".format(e))
             self.add_cat_pop.destroy()
-
-    
-    # Function for opening a window where a user can change the user credentials.       
+     
     def update_profile(self):
+        """
+        Function for opening a window where a user can change their user credentials.
+        Displays the current user credentials and allows the user to input new ones.
+        Upon clicking 'Save Changes', the updated user credentials are stored in the database.
+
+        Returns:
+            None.
+        """
         self.profile_popup = tk.Toplevel(self)
         self.profile_popup.title = ("Update your user credentials")
         self.profile_popup.geometry("400x400")
@@ -1380,41 +1558,54 @@ class main_screen(tk.Tk):
         self.entry_new_first_name.pack()
 
         # Create Label and Entry for last_name
-        self.new_last_name_label = tk.Label(self.profile_popup, text=f"Saved Last Name = {user_dict['last_name']}", pady = pady)
+        self.new_last_name_label = tk.Label(self.profile_popup, text=f"Saved Last Name = {user_dict['last_name']}", pady=pady)
         self.new_last_name_label.pack()
         self.entry_new_last_name = tk.Entry(self.profile_popup)
         self.entry_new_last_name.pack()
 
         # Create Label and Entry for username
-        self.new_username_label = tk.Label(self.profile_popup, text=f"Saved Username= {user_dict['username']}", pady = pady)
+        self.new_username_label = tk.Label(self.profile_popup, text=f"Saved Username= {user_dict['username']}", pady=pady)
         self.new_username_label.pack()
         self.entry_new_username = tk.Entry(self.profile_popup)
         self.entry_new_username.pack()
 
         # Create Label and Entry for password
-        self.new_password_label = tk.Label(self.profile_popup, text=f"Password = {user_dict['password']}", pady = pady)
+        self.new_password_label = tk.Label(self.profile_popup, text=f"Password = {user_dict['password']}", pady=pady)
         self.new_password_label.pack()
         self.entry_new_password = tk.Entry(self.profile_popup)
         self.entry_new_password.pack()
 
         # Create Label and Entry for email
-        self.new_email_label = tk.Label(self.profile_popup, text=f"Email = {user_dict['email']}", pady = pady)
+        self.new_email_label = tk.Label(self.profile_popup, text=f"Email = {user_dict['email']}", pady=pady)
         self.new_email_label.pack()
         self.entry_new_email = tk.Entry(self.profile_popup)
         self.entry_new_email.pack()
 
         # Create Label and Entry for Phone_number
-        self.new_phone_number_label = tk.Label(self.profile_popup, text=f"Phone_number = {user_dict['phone_number']}", pady = pady)
+        self.new_phone_number_label = tk.Label(self.profile_popup, text=f"Phone_number = {user_dict['phone_number']}", pady=pady)
         self.new_phone_number_label.pack()
         self.entry_new_phone_number = tk.Entry(self.profile_popup)
         self.entry_new_phone_number.pack()
 
         tk.Button(self.profile_popup, text="Save changes", command = self.save_profile_changes, width=10, height=1).pack()
 
-        self.profile_popup.wait_window() # Wait for popup window to be destroyed
+        self.profile_popup.wait_window()  # Wait for popup window to be destroyed
 
-    # Save changes for the user credentials in database
     def save_profile_changes(self):
+        """
+        Save changes for the user credentials in the database.
+
+        Retrieves the new user entries from the entry widgets and updates the corresponding values in the user's database
+        record. If the user inputs a new phone number or email address, the method checks that the phone number contains only
+        digits and the email address contains an '@' symbol.
+
+        Raises:
+            Error: If the phone number entered contains non-numeric characters or the email address entered does not contain
+            an '@' symbol.
+
+        Returns:
+            None.
+        """
         
         # Get all new entries of the user
         new_first_name = self.entry_new_first_name.get()
@@ -1430,6 +1621,15 @@ class main_screen(tk.Tk):
         # Get all stored credentials of the user stored in the database
         user_dict = self.db.get_user_credentials(active_user_ID)
 
+        # Check if the phone number entered contains only numbers
+        if new_phone_number and not new_phone_number.isnumeric():
+            messagebox.showerror("Error", "Phone number must contain only digits")
+            return
+
+        # Check if the email address entered contains an '@' symbol
+        if new_email and '@' not in new_email:
+            messagebox.showerror("Error", "Invalid email address")
+            return
 
         # Update the used dictionary (user_dict) for the user credentials with the new values if the user inputs some
         if new_first_name:
@@ -1457,11 +1657,13 @@ class main_screen(tk.Tk):
         
         # Close Profile Update Window
         self.profile_popup.destroy()
-
-
     
-# Function for the MyHabits button. 
     def open_analyze_myhabits(self):
+        """Opens a new window for analyzing the user's habits.
+
+        This method creates a new window where the user can choose one of several predefined analyses to carry out.
+        The user's selection is stored in the 'selected_option' attribute. The method also creates a button to update the table showing the results of the analysis.
+        """
         # Create a new window
         self.analyse_popup = tk.Toplevel(self)
         self.analyse_popup.title("Analyse MyHabits")
@@ -1492,11 +1694,20 @@ class main_screen(tk.Tk):
 
     # Function to Update the table depending on the users choice
     def update_analyse_table(self):
+        """
+        Update the analysis table based on the user's choice.
+
+        This function retrieves data from the database and displays it in a table or chart depending on the user's choice.
+        The function destroys any existing treeview widget to prevent overlapping.
+
+        The user has 4 different options to choose from.
+        """
         # First check if treeview widgets exits and if so destroy it. This prevents overlapping.
         for child in self.analyse_popup.winfo_children():
             if isinstance(child, ttk.Treeview):
                 child.destroy()
 
+        # Get selected user option
         analysis = self.selected_option.get()
         user_ID = self.user_ID
         # Depending on users choice a specific table opens
@@ -1529,14 +1740,13 @@ class main_screen(tk.Tk):
                 self.option_1_tree.column("Starting Date", anchor="w", width=150,minwidth=50)
                 
                 # Create Headings
-                self.option_1_tree.heading("#0",text="",anchor="w") # Remove Ghost column
-                self.option_1_tree.heading("Rank",text="Rank no. ",anchor="w")
+                self.option_1_tree.heading("#0",text="", anchor="w") # Remove Ghost column
+                self.option_1_tree.heading("Rank",text="Rank no. ", anchor="w")
                 self.option_1_tree.heading("Habit Name",text="Habit Name", anchor="w")
-                self.option_1_tree.heading("Streak",text="Streak",anchor="center")
-                self.option_1_tree.heading("Interval",text="Interval",anchor="w")
-                self.option_1_tree.heading("Status",text="Status",anchor="center")
-                self.option_1_tree.heading("Starting Date",text="Starting Date",anchor="w")
-                
+                self.option_1_tree.heading("Streak",text="Streak", anchor="center")
+                self.option_1_tree.heading("Interval",text="Interval", anchor="w")
+                self.option_1_tree.heading("Status",text="Status", anchor="center")
+                self.option_1_tree.heading("Starting Date",text="Starting Date", anchor="w")
                 
                 # Set a counter for inserting records
                 counter = 0
@@ -1628,6 +1838,22 @@ class main_screen(tk.Tk):
 
 # Function for the MyHabits button. 
     def open_highscores(self):
+        """
+        Opens a new window displaying highscores for different analysis options.
+        
+        This function creates a new window with a label prompting the user to select a highscore option from a dropdown menu. 
+        The selected option is stored in a StringVar object. The function also creates a button to update the highscore table when the option is selected.
+
+        Returns:
+            None.
+
+        Raises:
+            None.
+
+        Usage:
+            Call this function when the "MyHabits" button is clicked.
+        """
+        
         # Create a new window
         self.highscore_popup = tk.Toplevel(self)
         self.highscore_popup.title("Highscores")
@@ -1656,13 +1882,26 @@ class main_screen(tk.Tk):
         update_button = tk.Button(self.highscore_popup, text="Update Table", command=self.update_highscore_table)
         update_button.pack()
 
-    # Function to Update the table depending on the users choice
     def update_highscore_table(self):
+        """
+        Updates the highscore table depending on the user's selected option. 
+
+        If the user selects option 1, the function prompts the user to enter a monitoring interval (daily, weekly, or monthly). 
+        It then gets all active habits for the selected user and sorts them by the decreasing streak. If there are no active habits, 
+        it displays a message to the user. Otherwise, it creates a Treeview widget for the longest active streaks and populates it 
+        with the relevant data.
+
+        If the user selects option 2, the function gets all active habits for the selected user and calculates points for each habit 
+        based on its current streak and interval type (1 point for daily habits, 2 points for weekly habits, and 3 points for monthly habits). 
+        It then creates a Pandas DataFrame from the list of active habits and points, groups the data by username, and sums the points 
+        for each user. Finally, it creates a Treeview widget for the global points ranking and populates it with the relevant data.
+        """
         # First check if treeview widgets exits and if so destroy it. This prevents overlapping.
         for child in self.highscore_popup.winfo_children():
             if isinstance(child, ttk.Treeview):
                 child.destroy()
-
+        
+        # Get selected option from user 
         highscore_option = self.selected_option.get()
         user_ID = self.user_ID
         # Depending on users choice a specific table opens
@@ -1716,7 +1955,6 @@ class main_screen(tk.Tk):
                 self.highscore_1_tree.heading("Status",text="Status",anchor="center")
                 self.highscore_1_tree.heading("Starting Date",text="Starting Date",anchor="w")
                 
-                
                 # Set a counter for inserting records
                 counter = 0
 
@@ -1769,12 +2007,18 @@ class main_screen(tk.Tk):
             # display the chart
             plt.show()
 
+
+if __name__ == '__main__':
+    window = database_connection_screen()
+    window.mainloop()
+
+
 # window = main_screen()
 # window.mainloop()  
 
 
-window = database_connection_screen()
-window.mainloop()
+# window = database_connection_screen()
+# window.mainloop()
 
 # login_screen = login_screen()
 # login_screen.mainloop
