@@ -15,20 +15,31 @@ from datetime import timedelta
 import pandas as pd
 import matplotlib.pyplot as plt
 
+
+"""
+This file contains the main classes and functions for the Habit Tracker application.
+
+Classes:
+- database_connection_screen: The first screen of the Habit Tracker where the user enters database credentials.
+- login_screen: The screen where the user logs in to the Habit Tracker and creates a new account.
+- main_screen: The main screen of the Habit Tracker where the user can view and add habits.
+"""
+
 class database_connection_screen(tk.Tk):
     """The first screen of the Habit Tracker where the user enters database credentials for MySQL Database.
 
-    Attributes:
-        welcome_label (tk.Label): A label welcoming the user to the screen.
-        host_label (tk.Label): A label indicating the 'Host' input field.
-        entry_host (tk.Entry): An input field for the user to enter the host of their MySQL database.
-        user_label (tk.Label): A label indicating the 'User' input field.
-        entry_user (tk.Entry): An input field for the user to enter the username of their MySQL database.
-        password_label (tk.Label): A label indicating the 'Password' input field.
-        entry_password (tk.Entry): An input field for the user to enter the password of their MySQL database.
-        database_label (tk.Label): A label indicating the 'Database' input field.
-        entry_database (tk.Entry): An input field for the user to enter the name of their MySQL database.
-        confirm_button (tk.Button): A button that triggers the `confirm_values` function.
+    This screen contains several UI elements or widgets, including:
+
+        - A label welcoming the user to the screen.
+        - A label indicating the 'Host' input field.
+        - An input field for the user to enter the host of their MySQL database.
+        - A label indicating the 'User' input field.
+        - An input field for the user to enter the username of their MySQL database.
+        - A label indicating the 'Password' input field.
+        - An input field for the user to enter the password of their MySQL database.
+        - A label indicating the 'Database' input field.
+        - An input field for the user to enter the name of their MySQL database.
+        - A button that triggers the `confirm_values` function.
 
     Methods:
         confirm_values: Validates the user's input values, creates the database if it doesn't already exist, and stores

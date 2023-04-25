@@ -3,7 +3,53 @@ import time
 from tkinter import messagebox
 
 class MySQLDatabase:
+    """
+    A class for interacting with a MySQL Database.
+
+    Attributes:
+        host (str): The hostname of the MySQL server.
+        user (str): The username for the MySQL server.
+        password (str): The password for the MySQL server.
+        database (Optional[str]): The name of the MySQL database to use.
+
+    Methods:
+        __init__: Initializes the MySQLDatabase object.
+        connect: Connects to the MySQL server.
+        disconnect: Disconnects from the MySQL server.
+        create_database: Creates a new database on the MySQL server if it not allready exists.
+        initialize_database: Initializes the database by creating tables and and inserts sample data using Insert statements.
+        create_table: Creates a new table in the MySQL database.
+        delete_table: Deletes a table from the MySQL database.
+        insert_data: Inserts data into a table in the MySQL database.
+        update_data: Updates data in a table in the MySQL database.
+        check_value: Checks if a given value exists in a table in the MySQL database.
+        get_user_credentials: Retrieves user credentials from the MySQL database.
+        get_userID: Retrieves the user ID for a given username from the MySQL database.
+        get_user_habits: Retrieves all habits for a given user from the MySQL database.
+        get_habit_ID: Retrieves the habit ID for a given habit name and user ID from the MySQL database.
+        get_active_habits: Retrieves all active habits for a given user from the MySQL database.
+        get_global_active_habits: Retrieves all global active habits from the MySQL database.
+        get_all_active_habits: Retrieves all active habits from the MySQL database.
+        get_active_habit_ID: Retrieves the active habit ID for a given habit ID and user ID from the MySQL database.
+        get_streak: Retrieves the current streak for a given user and habit from the MySQL database.
+        delete_habit: Deletes a habit for a given user from the MySQL database.
+        update_value: Updates the value for a given habit for a given user in the MySQL database.
+        get_user_categories: Retrieves all categories for a given user from the MySQL database.
+        get_user_categories_name: Retrieves only the names of all categories for a given user from the MySQL database.
+        get_category_ID: Retrieves the category ID for a given category name and user ID from the MySQL database.
+        delete_category: Deletes a category for a given user from the MySQL database.
+        execute_query: Executes a custom SQL query on the MySQL database.
+    """
     def __init__(self, host, user, password, database = None):
+        """
+        Initializes a new MySQLDatabase object.
+
+        Args:
+            host (str): The hostname of the MySQL server.
+            user (str): The username for the MySQL server.
+            password (str): The password for the MySQL server.
+            database (Optional[str]): The name of the MySQL database to use.
+        """
         self.host = host
         self.user = user
         self.password = password
@@ -11,9 +57,13 @@ class MySQLDatabase:
         self.connection = None
         self.cursor = None
     
-    
-    # Connect to the MySQL database
     def connect(self):
+        """
+        Connects to the MySQL database using the credentials specified during object initialization.
+
+        Raises:
+            Exception: If the connection to the database fails.
+        """
         try:
             self.connection = mysql.connector.connect(
             host = self.host,
@@ -26,16 +76,32 @@ class MySQLDatabase:
             raise Exception("Failed to connect to MySQL database. Please check your credentials and try again.")
         self.cursor = self.connection.cursor()
 
-    # Disconnects from the database
     def disconnect(self):
+        """
+        Disconnects from the MySQL database.
+
+        Note:
+            This function does not raise any exceptions.
+        """
         if self.connection is not None:
             self.connection.close()
         if self.cursor is not None:
             self.cursor.close()
-
     
-    # Creates a MySQL Database with name = new_database if a database doesn't already exist with this name. When creating a new database it also calls the intitialize database function which creates tables and stores example data within the database.
+    
     def create_database(self,new_database):
+        """
+        Creates a new MySQL database with the given name if it does not already exist, and initializes the database with the necessary tables and sample data.
+
+        Args:
+            new_database (str): The name of the new database to be created.
+
+        Note:
+            The initialization function is called only if a new database is created.
+
+        Raises:
+            Exception: If there is an error while connecting to the database or initializing it.
+        """
         self.connect()
         self.cursor.execute(f"CREATE DATABASE IF NOT EXISTS {new_database}")
         self.database = new_database
@@ -44,9 +110,18 @@ class MySQLDatabase:
             messagebox.showinfo("Success", "Database created. You can go on and login/register.")
         self.disconnect()
 
-    # Initializes creating all necessary tables and sample data
     def initialize_database(self,database):
-        # Read the contents of the file that contains the SQL statements
+        """
+        Initializes the given MySQL database with the necessary tables and sample data by executing the SQL statements in a file.
+
+        Args:
+            database (str): The name of the database to be initialized.
+
+        Raises:
+            Exception: If there is an error while executing any of the SQL statements in the file.
+        """
+        
+        # Read the contents of the file that contains the SQL statements database_tables.txt which has to be located in the same folder
         with open('database_tables.txt', 'r') as f:
             sql = f.read()
 
@@ -74,9 +149,7 @@ class MySQLDatabase:
         for insert in inserts:
             try:
                 counter +=1
-                #print("Connection before connect():", self.connection)
                 self.connect()
-                #print("Connection after connect():", self.connection)
                 query = insert
                 self.cursor.execute(query)
                 self.connection.commit()
@@ -85,16 +158,22 @@ class MySQLDatabase:
                     print("No rows were inserted into the database.")
                 else:
                     print(f"{rows_affected} rows were inserted into the database.")
-                #self.cursor.close()
-                #print(query)
                 print(f"Insert {counter} executed, {query}")
                 time.sleep(0.15)
             except Exception as e:
                 print("An error occurred:", e)
 
-
-    # Creates a new table in the database if its not already existing
     def create_table(self, table_name, *columns):
+        """
+        Creates a new table in the database if it doesn't already exist.
+
+        Args:
+            table_name (str): The name of the table to be created.
+            *columns (str): One or more column definitions, each formatted as a string like 'column_name column_type', separated by commas.
+
+        Returns:
+            None
+        """
         self.connect()
         self.cursor.execute(f"SHOW TABLES LIKE '{table_name}'")
         result = self.cursor.fetchone()
@@ -108,8 +187,16 @@ class MySQLDatabase:
             print(f"Table '{table_name}' created successfully")
         self.disconnect()
     
-    # Deletes a table from the database
     def delete_table(self, table_name):
+        """
+        Deletes a table from the database.
+
+        Args:
+            table_name (str): The name of the table to be deleted.
+
+        Returns:
+            None
+        """
         self.connect()
         self.cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
         print(f"Table '{table_name}' deleted successfully")
@@ -118,24 +205,53 @@ class MySQLDatabase:
  
     # Inserts Values into tables  
     def insert_data(self, table_name, data):
+        """
+        Inserts a row of data into a table.
+
+        Args:
+            table_name (str): The name of the table into which data should be inserted.
+            data (dict): A dictionary containing the values to be inserted into the table, with keys corresponding to column names.
+
+        Returns:
+            None
+        """
+
+        # Establish a connection to the database
         self.connect()
+
+        # Construct the SQL query for inserting data into the table
         columns = ', '.join(data.keys())
         placeholders = ', '.join(['%s'] * len(data.values()))
         values = tuple(None if v == '' else v for v in data.values()) # set None for empty string values in dict
         query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
+        
+        # Execute the SQL query to insert data into the table
         self.cursor.execute(query, values)
         self.connection.commit()
-        print(f"{self.cursor.rowcount} row(s) inserted into {table_name}.")      
 
-    
-    
-    """
-    The data variable has to be defined as a dictionary first. Updates data of a given table. 
-    Data has to be a dictionary. Object is the primary key name without _ID. ID is the int value of the unique primary key.
- 
-    """
+        # Print the number of rows inserted into the table
+        print(f"{self.cursor.rowcount} row(s) inserted into {table_name}.")
+
+        # Disconnct from the datbase
+        self.disconnect()
+
     def update_data(self, table_name, data, object, ID):
+        """
+        Updates the values of a row in a given table.
+
+        Args:
+            table_name (str): The name of the table to update.
+            data (dict): A dictionary containing the column names and values to update.
+            object (str): The name of the primary key without '_ID'.
+            ID (int): The unique primary key value for the row to update.
+
+        Returns:
+            None
+        """
+
+        # Connect to the database
         self.connect()
+
         # Construct name of the primary key for where clause
         primary_key = f"{object}_ID"
         
@@ -148,13 +264,23 @@ class MySQLDatabase:
         #print(f"Data updated successfully")
         self.disconnect()
 
-
-
-    # Function to check wether a value exists in a table,column
     def  check_value(self, searched_value, table, column, value):
-        #establish connection with the database
+        """
+        Searches for a specific value in a table column.
+
+        Args:
+            searched_value (str): The column name to return.
+            table (str): The name of the table to search.
+            column (str): The name of the column to search.
+            value (str): The value to search for in the specified column.
+
+        Returns:
+            results (list): A list of tuples containing the search results.
+        """
+    
+        # Establish connection with the database
         self.connect()  
-        # query  
+        # Construct query  
         sql = f"SELECT {searched_value} FROM {table} WHERE {column} = %s"
         self.cursor.execute(sql, (value,))
         results = self.cursor.fetchall()
@@ -167,12 +293,24 @@ class MySQLDatabase:
             print("User not found.")
             self.disconnect()
     
-    # Function for querying the database for all user credentials by using the Primary Key (user_ID) and returning a dictionary
     def get_user_credentials(self,user_ID):
+        """
+        Queries the database for user credentials using the user_ID as the primary key.
 
+        Args:
+            user_ID (int): The unique user identifier.
+
+        Returns:
+            result_dict (dict): A dictionary containing the user's credentials.
+        """
+        
+        # Establish connection to the database
         self.connect()
-
+        
+        # Set variable table to value "user_table" for query.
         table = "user_table"
+
+        # Create list of column names
         column_names = ["user_ID", "username", "first_name", "last_name", "password", "email", "phone_number", "created_time", "last_update"]
         
         # Construct the SQL query
@@ -194,9 +332,18 @@ class MySQLDatabase:
         
         return result_dict
 
-
-    # Function to give back the unique user_ID for a username
     def  get_userID(self, username):
+        """
+        Retrieves the unique user_ID for a given username.
+
+        Args:
+            username (str): The username to search for.
+
+        Returns:
+            int: The user_ID for the given username, or None if no matching user is found.
+        """
+        
+        # Establish connection to the database
         self.connect()
 
         table = "user_table"
@@ -219,9 +366,18 @@ class MySQLDatabase:
             print("User not found.")
             self.disconnect()
    
-
-   # Function for querying for all stored habits of a user
     def get_user_habits(self, user_ID):
+        """
+        Retrieves all stored habits of a given user.
+
+        Args:
+            user_ID (int): The user_ID of the user whose habits to retrieve.
+
+        Returns:
+            list of tuples: A list of tuples, where each tuple contains information about a habit, including the habit's ID, name, description, creation date, and category name.
+        """
+
+        # Establish connection to the database
         self.connect()
         cursor = self.connection.cursor()
         # Query for returning all habits from the user plus the predefined system user habits. The Systemuser has the user_ID 99
@@ -229,37 +385,76 @@ class MySQLDatabase:
 	                    FROM habits  
                         INNER JOIN category ON habits.category_ID = category.category_ID
                         WHERE habits.user_ID = %s OR habits.user_ID = 99;                
-                """    
+                """
+        # Execute query    
         cursor.execute(query, (user_ID,))
         habits = cursor.fetchall()
         cursor.close()
         self.connection.close()
+
+        # return list
         return habits
     
     # Function to get a habit_ID by using the habit_name and user_ID
     def get_habit_ID(self, user_ID, habit_name):
+        """
+        Retrieves the habit_ID for a given habit name and user_ID.
+
+        Args:
+            user_ID (int): The user_ID of the user who owns the habit.
+            habit_name (str): The name of the habit to search for.
+
+        Returns:
+            int: The habit_ID for the given habit name and user_ID, or None if no matching habit is found.
+        """
+
+        # Connect to database
         self.connect()
+
         # Information about user and habit
         self.user_ID = user_ID
         self.habit_name = habit_name
         
+        # Set table_name
         table_name = 'habits'
         cursor = self.connection.cursor()
-        # Query for returning the habit_ID 
+
+        # Construct query for returning the habit_ID 
         query = f'''SELECT active_user_habits.habit_ID FROM active_user_habits
                     INNER JOIN habits ON active_user_habits.habit_ID = habits.habit_ID
                     WHERE habits.habit_name = '{habit_name}' AND (habits.user_ID = {user_ID} OR habits.user_ID = 99)
                 '''
+        
+        # Execute query
         cursor.execute(query)
         habit_ID = cursor.fetchone()
-        #print(habit_ID)
+
+        # Return the habit_ID
         return habit_ID
     
-
-    # Function for querying for all stored active habits of a user. The active habits in the table with the status deleted are excluded.
     def get_active_habits(self, user_ID):
+        """
+        Returns all stored active habits of a user, excluding those with the status 'deleted'.
+        
+        Args:
+            user_ID (int): The user ID for the user whose active habits are to be retrieved.
+        
+        Returns:
+            A list of tuples, where each tuple represents an active habit and contains the following values:
+            - active_habits_ID (int): The ID of the active habit.
+            - habit_name (str): The name of the habit.
+            - starting_date (datetime.datetime): The date when the user started the habit.
+            - last_check (datetime.datetime): The date when the user last checked in for the habit.
+            - update_expiry (datetime.datetime): The date when the user's habit streak will expire if not updated.
+            - streak (int): The number of consecutive days the user has checked in for the habit.
+            - control_interval (int): The number of days for each monitoring interval for the habit.
+            - status (str): The status of the active habit.
+        """
+
+        # Establish connection to the database
         self.connect()
         cursor = self.connection.cursor()
+
         # Query for returning all active habits from the user.
         query = """SELECT active_user_habits.active_habits_ID, habits.habit_name, active_user_habits.starting_date, active_user_habits.last_check, active_user_habits.update_expiry, active_user_habits.streak, monitoring_interval.control_interval, active_user_habits.status
 	                    FROM active_user_habits  
@@ -267,15 +462,34 @@ class MySQLDatabase:
                         INNER JOIN monitoring_interval ON active_user_habits.interval_ID = monitoring_interval.interval_ID
                         WHERE active_user_habits.user_ID = %s AND active_user_habits.status != 'deleted';
                 """
-        #print(query)    
+        # Execute constructed query
         cursor.execute(query, (user_ID,))
         active_habits = cursor.fetchall()
-        #print(active_habits)
         cursor.close()
         self.connection.close()
+
+        # Return loist with active habits
         return active_habits
     
     def get_global_active_habits(self,interval_ID):
+        """
+        Returns all stored active habits across all users with a given monitoring interval.
+        
+        Args:
+            interval_ID (int): The ID of the monitoring interval for the active habits to be retrieved.
+        
+        Returns:
+            A list of tuples, where each tuple represents an active habit and contains the following values:
+            - active_habits_ID (int): The ID of the active habit.
+            - habit_name (str): The name of the habit.
+            - starting_date (datetime.datetime): The date when the user started the habit.
+            - last_check (datetime.datetime): The date when the user last checked in for the habit.
+            - update_expiry (datetime.datetime): The date when the user's habit streak will expire if not updated.
+            - streak (int): The number of consecutive days the user has checked in for the habit.
+            - control_interval (int): The number of days for each monitoring interval for the habit.
+            - status (str): The status of the active habit.
+            - username (str): The username of the user associated with the active habit.
+        """
         self.connect()
         cursor = self.connection.cursor()
         # Query for returning all active habits from the user.
@@ -287,15 +501,36 @@ class MySQLDatabase:
                         WHERE active_user_habits.interval_ID = {interval_ID}   
                         ORDER BY active_user_habits.streak DESC;
                 """
-        #print(query)    
+        
+        # Execute constructed query
         cursor.execute(query)
         active_habits = cursor.fetchall()
-        #print(active_habits)
         cursor.close()
         self.connection.close()
+
+        # Return list
         return active_habits
     
     def get_all_active_habits(self, user_ID):
+        """
+        Returns all stored active habits of a user.
+        
+        Args:
+            user_ID (int): The user ID for the user whose active habits are to be retrieved.
+        
+        Returns:
+            A list of tuples, where each tuple represents an active habit and contains the following values:
+            - active_habits_ID (int): The ID of the active habit.
+            - habit_name (str): The name of the habit.
+            - starting_date (datetime.datetime): The date when the user started the habit.
+            - last_check (datetime.datetime): The date when the user last checked in for the habit.
+            - update_expiry (datetime.datetime): The date when the user's habit streak will expire if not updated.
+            - streak (int): The number of consecutive days the user has checked in for the habit.
+            - control_interval (int): The number of days for each monitoring interval for the habit.
+            - status (str): The status of the active habit.
+            - goal_streak (int): The user's goal streak for the habit.
+        """
+        # Establish connection to the database
         self.connect()
         cursor = self.connection.cursor()
         # Query for returning all active habits from the user.
@@ -314,8 +549,20 @@ class MySQLDatabase:
         self.connection.close()
         return active_habits
 
-    # Function for querying for the active_habit_ID for a specific activce habit from a user
     def get_active_habit_ID(self, user_ID, habit_ID, status):
+        """
+        Returns the active_habit_ID for a specific active habit of a user.
+        
+        Args:
+            user_ID (int): The user ID for the user whose active habit ID is to be retrieved.
+            habit_ID (int): The habit ID for the habit whose active habit ID is to be retrieved.
+            status (str): The status of the active habit for which the ID is to be retrieved.
+        
+        Returns:
+            An integer representing the ID of the active habit.
+        """
+
+        # Connect to db.
         self.connect()
         cursor = self.connection.cursor()
         # Query
@@ -333,20 +580,37 @@ class MySQLDatabase:
         else:
             # store the first value from the list
             result = int(active_habit_ID[0])
-            #print(query)
             return result
     
     # Function to get the current streak for a active_habit
     def get_streak(self, active_habits_ID):
+        """
+        Returns the current streak for a specific active habit from a user.
+    
+        Args:
+            active_habits_ID (int): The ID of the active habit.
+    
+        Returns:
+            An integer representing the current streak for the active habit.
+        """
+
+        # Establish connection
         self.connect()
         cursor = self.connection.cursor()
 
+        # Construct query
         query = f"""SELECT streak FROM active_user_habits
                     WHERE active_habits_ID = {active_habits_ID}"""
+        
+        # Execute query
         cursor.execute(query)
+
+        # Get the streak
         streak = cursor.fetchone()
         cursor.close()
         self.connection.close()
+
+        # Check if one value was retrieved
         if len(streak) > 1:
             print("Too many possible habits")
         elif len(streak) < 1:
@@ -354,39 +618,71 @@ class MySQLDatabase:
         else:
             # store the first value from the list
             result = int(streak[0])
-            #print(query)
+
+            # Return the current streak
             return result
          
-    
-    # Function for deleting a habit from a specific user in the database
     def delete_habit(self, habit_ID):
+        """
+        Deletes a habit from the habits table in the database.
+        
+        Args:
+            habit_ID (int): The ID of the habit to be deleted.
+        """
+        
+        # Establish connection
         self.connect()
         cursor = self.connection.cursor()
         # Query for deleting a habit from the habits table using the habit_ID
         query = f"""DELETE FROM habits WHERE habit_ID = {habit_ID};
                 COMMIT;"""
-        #print(query)
+
+        # Execute query
         cursor.execute(query,multi=True)
         cursor.close()
         self.connection.close()
 
-    # Update a value in a table with the information of two columns
     def update_value(self, table_name, data, column1, column2, value1, value2, join_table = None):
+        """
+        Updates a value in a  database table with the information of two columns.
+        
+        Args:
+            table_name (str): The name of the table to update.
+            data (dict): A dictionary with the column names as keys and the new values as values.
+            column1 (str): The name of the first column to use for updating.
+            column2 (str): The name of the second column to use for updating.
+            value1 (any): The value of the first column to use for updating.
+            value2 (any): The value of the second column to use for updating.
+            join_table (str, optional): The name of the table to join. Defaults to None.
+        """
+        # Connect to db
         self.connect()      
         
         # Set string for the sql query
         set_str = ", ".join([f"{col_name} = '{col_value}'" for col_name, col_value in data.items()])
         table_join = f" INNER JOIN {join_table} ON {table_name}"
+        
         # Execute the query for updating values
-        #self.cursor.execute(f"UPDATE {table_name} SET {set_str} WHERE {table_name}.{column1} = {value1} AND {table_name}.{column2} = {value2}")
+        self.cursor.execute(f"UPDATE {table_name} SET {set_str} WHERE {table_name}.{column1} = {value1} AND {table_name}.{column2} = {value2}")
         print(f"UPDATE {table_name} {table_join} SET {set_str} WHERE {table_name}.{column1} = {value1} AND {table_name}.{column2} = {value2}")
         self.connection.commit()
         print(f"Data updated successfully")
         self.disconnect()  
 
-
-   # Function for querying for all stored categories of a user (only catgeory name)
     def get_user_categories(self, user_ID):
+        """
+        Retrieves all categories stored for a given user from the database.
+
+        Args:
+        - user_ID (int): The unique identifier for the user.
+
+        Returns:
+        - categories (list of tuples): A list of tuples where each tuple represents a category. The tuple contains the following information:
+            - category_ID (int): The unique identifier for the category.
+            - category_name (str): The name of the category.
+            - description (str): The description of the category.
+            - creation_date (str): The date when the category was created.
+        """
         self.connect()
         cursor = self.connection.cursor()
         #query = "SELECT * FROM habits WHERE user_ID = %s"
@@ -402,6 +698,17 @@ class MySQLDatabase:
     
     # Function for querying for all stored categories of a user (only catgeory name)
     def get_user_categories_name(self, user_ID):
+        """
+        Retrieves the names of all categories stored for a given user from the database.
+
+        Args:
+        - user_ID (int): The unique identifier for the user.
+
+        Returns:
+        - categories (list of tuples): A list of tuples where each tuple represents a category name (str). The tuple contains the following information:
+        """
+        
+        # Connect to db
         self.connect()
         cursor = self.connection.cursor()
         #query = "SELECT * FROM habits WHERE user_ID = %s"
@@ -415,15 +722,26 @@ class MySQLDatabase:
         cursor.close()
         self.connection.close()
         return categories
-    
-     # Function to give back the unique catgeory_ID for a category_name and a unique user_ID
+
     def get_category_ID(self, category_name, user_ID):
+        """
+        Retrieves the unique identifier for a category given its name and the unique identifier of its owner.
+
+        Args:
+        - category_name (str): The name of the category.
+        - user_ID (int): The unique identifier for the user.
+
+        Returns:
+        - category_ID (int): The unique identifier for the category.
+        """
+        
+        # Connect to db
         self.connect()
 
         table = "category"
         column = "category_name"
 
-        # query for returning user_ID
+        # Query for returning user_ID
         sql = f"SELECT category_ID FROM {table} WHERE {column} = '{category_name}' AND (user_ID = {user_ID} OR user_ID = 99);"
         print(sql)
         self.cursor.execute(sql)
@@ -432,16 +750,24 @@ class MySQLDatabase:
         # Print out the results
         if len(result) > 0:
             category_ID = result[0]
-            #print(category_ID)
             self.disconnect()
             return category_ID
-        # 
+        # Print category not found if result not fond
         else:
             print("Category not found.")
             self.disconnect()
     
-    # Function for deleting a category from a specific user in the database
     def delete_category(self, category_ID):
+        """Delete a category from a specific user in the database.
+        
+        Args:
+            category_ID (int): The ID of the category to delete.
+            
+        Returns:
+            None
+        """
+        
+        # Connect to db
         self.connect()
         cursor = self.connection.cursor()
         # Query for deleting a category from the category table using the category_ID
@@ -451,44 +777,23 @@ class MySQLDatabase:
         cursor.close()
         self.connection.close()
 
-    # Function for executing a query
     def execute_query(self, query):
+        """Execute a SQL query.
+    
+        Args:
+            query (str): The SQL query to execute.
+            
+        Returns:
+            results (tuple): The results of the SQL query.
+        """
+        # Connect to db
         self.connect()
         self.query = query
         self.cursor.execute(query)
         results = self.cursor.fetchone()
         self.connection.close()
         return results
-    
-    def create_database_tables(self,database):
-    # Read the contents of the file that contains the SQL statements
-        with open('database_tables.txt', 'r') as f:
-            sql = f.read()
-
-        # Split the SQL statements by the semicolon delimiter and remove any leading/trailing white space
-        statements = []
-        statements.append(f"USE {database};")
-        statements += [x.strip() for x in sql.split(';')]
-
-        # Execute each SQL statement
-        for statement in statements:
-            #print(statement)
-            try:
-                self.cursor.execute(statement)
-                self.connection.commit()
-                print(f"Table created")
-            except Exception as e:
-                print(f"An error occurred while executing SQL statement: {statement}")
-                print(f"Error message: {str(e)}")
-
-    
-
-
-        
-
-
-
-
+  
 
 
 
