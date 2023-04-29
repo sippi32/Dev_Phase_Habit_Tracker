@@ -74,7 +74,7 @@ class MySQLDatabase:
         except Exception as e: 
             messagebox.showerror("Error","There is something wrong with your database credentials. Please check and try again.")
             raise Exception("Failed to connect to MySQL database. Please check your credentials and try again.")
-        self.cursor = self.connection.cursor()
+        self.cursor = self.connection.cursor(buffered=True)
 
     def disconnect(self):
         """
@@ -83,6 +83,7 @@ class MySQLDatabase:
         Note:
             This function does not raise any exceptions.
         """
+
         if self.connection is not None:
             self.connection.close()
         if self.cursor is not None:
@@ -102,13 +103,15 @@ class MySQLDatabase:
         Raises:
             Exception: If there is an error while connecting to the database or initializing it.
         """
-        self.connect()
-        self.cursor.execute(f"CREATE DATABASE IF NOT EXISTS {new_database}")
-        self.database = new_database
-        if self.cursor.rowcount == 1:
-            self.initialize_database(self.database) # Call database initialization function if a new database was created
-            messagebox.showinfo("Success", "Database created. You can go on and login/register.")
-        self.disconnect()
+        try:
+            self.connect()
+            self.cursor.execute(f"CREATE DATABASE IF NOT EXISTS {new_database}")
+            self.database = new_database
+            if self.cursor.rowcount == 1:
+                self.initialize_database(self.database) # Call database initialization function if a new database was created
+                messagebox.showinfo("Success", "Database created. You can go on and login/register.")
+        finally:
+            self.disconnect()
 
     def initialize_database(self,database):
         """
@@ -259,9 +262,11 @@ class MySQLDatabase:
         set_str = ", ".join([f"{col_name} = '{col_value}'" for col_name, col_value in data.items()])
         
         # Execute the query for updating values
-        self.cursor.execute(f"UPDATE {table_name} SET {set_str} WHERE {primary_key} = {ID} ")
+        self.cursor.execute(f"UPDATE {table_name} SET {set_str} WHERE {primary_key} = {ID}")
         self.connection.commit()
-        #print(f"Data updated successfully")
+
+        
+        # Disconnect from database 
         self.disconnect()
 
     def  check_value(self, searched_value, table, column, value):
@@ -289,6 +294,7 @@ class MySQLDatabase:
         if len(results) > 0:                      
             self.disconnect()
             return results 
+
         else:
             print("User not found.")
             self.disconnect()
@@ -317,17 +323,18 @@ class MySQLDatabase:
         query = f"SELECT {', '.join(column_names)} FROM {table} WHERE user_ID = %s"
         
         # Execute the query and fetch the results
-        cursor = self.connection.cursor()
-        cursor.execute(query, (user_ID,))
-        result = cursor.fetchone()
+        # cursor = self.connection.cursor()
+        self.cursor.execute(query, (user_ID,))
+        result = self.cursor.fetchone()
         
         # Store the results in a dictionary
         if result:
             result_dict = dict(zip(column_names, result))
+            print(result_dict)
         else:
             result_dict = {}
         
-        cursor.close()
+        self.cursor.close()
         self.connection.close()
         
         return result_dict
@@ -379,7 +386,7 @@ class MySQLDatabase:
 
         # Establish connection to the database
         self.connect()
-        cursor = self.connection.cursor()
+
         # Query for returning all habits from the user plus the predefined system user habits. The Systemuser has the user_ID 99
         query = """SELECT habits.habit_ID, habits.habit_name, habits.description, habits.creation_date, category.category_name
 	                    FROM habits  
@@ -387,10 +394,9 @@ class MySQLDatabase:
                         WHERE habits.user_ID = %s OR habits.user_ID = 99;                
                 """
         # Execute query    
-        cursor.execute(query, (user_ID,))
-        habits = cursor.fetchall()
-        cursor.close()
-        self.connection.close()
+        self.cursor.execute(query, (user_ID,))
+        habits = self.cursor.fetchall()
+        self.disconnect()
 
         # return list
         return habits
@@ -417,8 +423,7 @@ class MySQLDatabase:
         
         # Set table_name
         table_name = 'habits'
-        cursor = self.connection.cursor()
-
+        
         # Construct query for returning the habit_ID 
         query = f'''SELECT active_user_habits.habit_ID FROM active_user_habits
                     INNER JOIN habits ON active_user_habits.habit_ID = habits.habit_ID
@@ -426,8 +431,14 @@ class MySQLDatabase:
                 '''
         
         # Execute query
-        cursor.execute(query)
-        habit_ID = cursor.fetchone()
+        self.cursor.execute(query)
+        habit_ID = self.cursor.fetchone()
+
+        # Commit changes to the database
+        self.connection.commit()
+
+        # Disconnect from database
+        self.disconnect()
 
         # Return the habit_ID
         return habit_ID
@@ -453,7 +464,6 @@ class MySQLDatabase:
 
         # Establish connection to the database
         self.connect()
-        cursor = self.connection.cursor()
 
         # Query for returning all active habits from the user.
         query = """SELECT active_user_habits.active_habits_ID, habits.habit_name, active_user_habits.starting_date, active_user_habits.last_check, active_user_habits.update_expiry, active_user_habits.streak, monitoring_interval.control_interval, active_user_habits.status
@@ -463,10 +473,18 @@ class MySQLDatabase:
                         WHERE active_user_habits.user_ID = %s AND active_user_habits.status != 'deleted';
                 """
         # Execute constructed query
-        cursor.execute(query, (user_ID,))
-        active_habits = cursor.fetchall()
-        cursor.close()
+        self.cursor.execute(query, (user_ID,))
+        active_habits = self.cursor.fetchall()
+
+        # Commit changes to the database
+        self.connection.commit()
+        
+        # Close cursor and connection
+        self.cursor.close()
         self.connection.close()
+
+        # Disconnect function
+        self.disconnect()
 
         # Return loist with active habits
         return active_habits
@@ -490,8 +508,9 @@ class MySQLDatabase:
             - status (str): The status of the active habit.
             - username (str): The username of the user associated with the active habit.
         """
+        # Connect to database
         self.connect()
-        cursor = self.connection.cursor()
+
         # Query for returning all active habits from the user.
         query = f"""SELECT active_user_habits.active_habits_ID, habits.habit_name, active_user_habits.starting_date, active_user_habits.last_check, active_user_habits.update_expiry, active_user_habits.streak, monitoring_interval.control_interval, active_user_habits.status, user_table.username
 	                    FROM active_user_habits  
@@ -503,11 +522,18 @@ class MySQLDatabase:
                 """
         
         # Execute constructed query
-        cursor.execute(query)
-        active_habits = cursor.fetchall()
-        cursor.close()
+        self.cursor.execute(query)
+        active_habits = self.cursor.fetchall()
+
+        # Commit changes to the database
+        self.connection.commit()
+        
+        # Close cursor and connection
+        self.cursor.close()
         self.connection.close()
 
+        # Disconnect function
+        self.disconnect()
         # Return list
         return active_habits
     
@@ -532,7 +558,7 @@ class MySQLDatabase:
         """
         # Establish connection to the database
         self.connect()
-        cursor = self.connection.cursor()
+
         # Query for returning all active habits from the user.
         query = """SELECT active_user_habits.active_habits_ID, habits.habit_name, active_user_habits.starting_date, active_user_habits.last_check, active_user_habits.update_expiry, active_user_habits.streak, monitoring_interval.control_interval, active_user_habits.status, active_user_habits.goal_streak
 	                    FROM active_user_habits  
@@ -541,12 +567,21 @@ class MySQLDatabase:
                         WHERE active_user_habits.user_ID = %s
                         ORDER BY active_user_habits.streak DESC;
                 """
-        #print(query)    
-        cursor.execute(query, (user_ID,))
-        active_habits = cursor.fetchall()
-        #print(active_habits)
-        cursor.close()
+  
+        self.cursor.execute(query, (user_ID,))
+        active_habits = self.cursor.fetchall()
+
+        # Commit changes to the database
+        self.connection.commit()
+        
+        # Close cursor and connection
+        self.cursor.close()
         self.connection.close()
+
+        # Disconnect function
+        self.disconnect()
+
+        # Return all active habits as a list of tuples
         return active_habits
 
     def get_active_habit_ID(self, user_ID, habit_ID, status):
@@ -564,15 +599,17 @@ class MySQLDatabase:
 
         # Connect to db.
         self.connect()
-        cursor = self.connection.cursor()
+
         # Query
         query = f""" SELECT active_habits_ID FROM active_user_habits
                     WHERE user_ID = {user_ID} AND habit_ID = {habit_ID} AND status = "{status}";
         """ 
-        cursor.execute(query)
-        active_habit_ID = cursor.fetchone()
-        cursor.close()
-        self.connection.close()
+        self.cursor.execute(query)
+        active_habit_ID = self.cursor.fetchone()
+
+        # Commit changes to the database
+        self.connection.commit()
+        self.disconnect()
         if len(active_habit_ID) > 1:
             print("Too many possible habits")
         elif len(active_habit_ID) < 1:
@@ -596,19 +633,22 @@ class MySQLDatabase:
 
         # Establish connection
         self.connect()
-        cursor = self.connection.cursor()
 
         # Construct query
         query = f"""SELECT streak FROM active_user_habits
                     WHERE active_habits_ID = {active_habits_ID}"""
         
         # Execute query
-        cursor.execute(query)
+        self.cursor.execute(query)
 
         # Get the streak
-        streak = cursor.fetchone()
-        cursor.close()
-        self.connection.close()
+        streak = self.cursor.fetchone()
+
+        # Commit changes to the database
+        self.connection.commit()
+
+        # Disconnect function
+        self.disconnect()
 
         # Check if one value was retrieved
         if len(streak) > 1:
@@ -632,14 +672,18 @@ class MySQLDatabase:
         
         # Establish connection
         self.connect()
-        cursor = self.connection.cursor()
+
         # Query for deleting a habit from the habits table using the habit_ID
-        query = f"""DELETE FROM habits WHERE habit_ID = {habit_ID};
-                COMMIT;"""
+        query = f"""DELETE FROM habits WHERE habit_ID = {habit_ID};"""
 
         # Execute query
-        cursor.execute(query,multi=True)
-        cursor.close()
+        self.cursor.execute(query)
+
+        # Commit changes to the database
+        self.connection.commit()
+        
+        # Close cursor and connection
+        self.cursor.close()
         self.connection.close()
 
     def update_value(self, table_name, data, column1, column2, value1, value2, join_table = None):
@@ -769,12 +813,18 @@ class MySQLDatabase:
         
         # Connect to db
         self.connect()
-        cursor = self.connection.cursor()
+
         # Query for deleting a category from the category table using the category_ID
         query = f"""DELETE FROM category WHERE category_ID = {category_ID};"""
-        #print(query)
-        cursor.execute(query)
-        cursor.close()
+
+        # Execute query
+        self.cursor.execute(query)
+
+        # Commit changes to the database
+        self.connection.commit()
+        
+        # Close cursor and connection
+        self.cursor.close()
         self.connection.close()
 
     def execute_query(self, query):
@@ -791,6 +841,7 @@ class MySQLDatabase:
         self.query = query
         self.cursor.execute(query)
         results = self.cursor.fetchone()
+        self.connection.commit()
         self.connection.close()
         return results
   
@@ -800,7 +851,11 @@ class MySQLDatabase:
 
 
 
-# db = MySQLDatabase("localhost","root","Mannheim","lulu")
+db = MySQLDatabase("localhost","root","Mannheim", "zepp")
+habits = db.get_all_active_habits(1)
+
+print(habits)
+# db.create_table()
 # db.connect()
 
 

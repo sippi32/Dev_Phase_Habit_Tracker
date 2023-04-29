@@ -4,6 +4,7 @@ from tkinter import ttk
 from tkinter import simpledialog
 import tkcalendar
 import mysql.connector
+from mysql.connector.errors import Error
 from database import MySQLDatabase
 from user import User
 from habit import Habit
@@ -28,7 +29,7 @@ Classes:
 class database_connection_screen(tk.Tk):
     """The first screen of the Habit Tracker where the user enters database credentials for MySQL Database.
 
-    This screen contains several UI elements or widgets, including:
+    This screen contains several labels and input fields, including:
 
         - A label welcoming the user to the screen.
         - A label indicating the 'Host' input field.
@@ -674,12 +675,15 @@ class main_screen(tk.Tk):
             user_ID = self.user_ID
             query = f"""UPDATE active_user_habits INNER JOIN habits ON active_user_habits.habit_ID = habits.habit_ID
                         SET status = 'deleted'
-                        WHERE active_user_habits.user_ID = {user_ID} AND habits.habit_name = '{active_habit_name}';
-                        COMMIT;                        
+                        WHERE active_user_habits.user_ID = {user_ID} AND habits.habit_name = '{active_habit_name}';                       
                         """
             # Use execute query function to execute the query and set the status to 'deleted' in the database for this active habit. 
-            self.db.execute_query(query)
-            messagebox.showinfo("Success","Habit not active any longer. Please update table.")
+            try:
+                self.db.execute_query(query)
+                messagebox.showinfo("Success","Habit not active any longer. Please update table.")
+            except Error as e:
+                messagebox.showerror("Error", f"An error occurred: {str(e)}")
+
 
     def update_active_habits_table(self):
         """Updates the active habits treeview with the current user's active habits.
@@ -832,8 +836,7 @@ class main_screen(tk.Tk):
                 query = f"""UPDATE active_user_habits
                             INNER JOIN habits ON active_user_habits.habit_ID = habits.habit_ID
                             SET status = 'deleted'
-                            WHERE active_user_habits.user_ID = {user_ID} AND habits.habit_name = '{active_habit_name}' AND active_user_habits.status = 'failed';                      
-                            COMMIT;                        
+                            WHERE active_user_habits.user_ID = {user_ID} AND habits.habit_name = '{active_habit_name}' AND active_user_habits.status = 'failed';                  
                     """
                 # Execute query to delete old_active_habit
                 self.db.execute_query(query)
