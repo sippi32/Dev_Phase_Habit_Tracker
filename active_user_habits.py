@@ -1,8 +1,4 @@
-# from database import MySQLDatabase
 import datetime as dt
-# from user import User
-# from habit import Habit
-# from category import Category
 
 class ActiveUserHabit:
     """

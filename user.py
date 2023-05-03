@@ -1,7 +1,4 @@
-# import tkinter as tk
 import datetime as dt
-# import time
-# from habit import Habit
 
 class User:
     """A class representing a user account.
