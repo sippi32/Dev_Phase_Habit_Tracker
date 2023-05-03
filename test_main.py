@@ -1,6 +1,5 @@
 import unittest
 from unittest.mock import patch, Mock
-import os
 from main import login_screen
 from database import MySQLDatabase
 
@@ -57,3 +56,6 @@ class TestLoginScreen(unittest.TestCase):
             self.login_screen.save_registration()
         self.assertIn("Phone number must contain only digits", self.login_screen.popup.showerror.call_args[0][1])
         self.login_screen.popup.destroy.assert_not_called()
+
+    if __name__ == '__main__':
+        unittest.main()

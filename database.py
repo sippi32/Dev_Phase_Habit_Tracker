@@ -682,9 +682,8 @@ class MySQLDatabase:
         # Commit changes to the database
         self.connection.commit()
         
-        # Close cursor and connection
-        self.cursor.close()
-        self.connection.close()
+        # Disconnect function
+        self.disconnect()
 
     def update_value(self, table_name, data, column1, column2, value1, value2, join_table = None):
         """
@@ -707,8 +706,8 @@ class MySQLDatabase:
         table_join = f" INNER JOIN {join_table} ON {table_name}"
         
         # Execute the query for updating values
-        self.cursor.execute(f"UPDATE {table_name} SET {set_str} WHERE {table_name}.{column1} = {value1} AND {table_name}.{column2} = {value2}")
-        print(f"UPDATE {table_name} {table_join} SET {set_str} WHERE {table_name}.{column1} = {value1} AND {table_name}.{column2} = {value2}")
+        self.cursor.execute(f"UPDATE {table_name} SET {set_str} WHERE {table_name}.{column1} = '{value1}' AND {table_name}.{column2} = '{value2}';")
+        
         self.connection.commit()
         print(f"Data updated successfully")
         self.disconnect()  
@@ -727,17 +726,22 @@ class MySQLDatabase:
             - description (str): The description of the category.
             - creation_date (str): The date when the category was created.
         """
+        # Connect to db
         self.connect()
-        cursor = self.connection.cursor()
-        #query = "SELECT * FROM habits WHERE user_ID = %s"
+
         query = """SELECT category.category_ID, category.category_name, category.description, category.creation_date
 	                    FROM category  
                         WHERE category.user_ID = %s OR category.user_ID = 99;
                 """    
-        cursor.execute(query, (user_ID,))
-        categories = cursor.fetchall()
-        cursor.close()
-        self.connection.close()
+        self.cursor.execute(query, (user_ID,))
+        categories = self.cursor.fetchall()
+
+        # Commit changes to the database
+        self.connection.commit()
+        
+        # Disconnect function
+        self.disconnect()
+
         return categories
     
     # Function for querying for all stored categories of a user (only catgeory name)
@@ -754,17 +758,20 @@ class MySQLDatabase:
         
         # Connect to db
         self.connect()
-        cursor = self.connection.cursor()
-        #query = "SELECT * FROM habits WHERE user_ID = %s"
+
         query = """SELECT category.category_name
 	                    FROM category  
                         WHERE category.user_ID = %s OR category.user_ID = 99;      
-                
                 """    
-        cursor.execute(query, (user_ID,))
-        categories = cursor.fetchall()
-        cursor.close()
-        self.connection.close()
+        self.cursor.execute(query, (user_ID,))
+        categories = self.cursor.fetchall()
+
+        # Commit changes to the database
+        self.connection.commit()
+        
+        # Disconnect function
+        self.disconnect()
+
         return categories
 
     def get_category_ID(self, category_name, user_ID):
@@ -787,18 +794,24 @@ class MySQLDatabase:
 
         # Query for returning user_ID
         sql = f"SELECT category_ID FROM {table} WHERE {column} = '{category_name}' AND (user_ID = {user_ID} OR user_ID = 99);"
-        print(sql)
+
+        # Execute Query
         self.cursor.execute(sql)
         result = self.cursor.fetchone()
 
         # Print out the results
         if len(result) > 0:
             category_ID = result[0]
+
+            # Commit changes to the database
+            self.connection.commit()
             self.disconnect()
             return category_ID
         # Print category not found if result not fond
         else:
             print("Category not found.")
+            # Commit changes to the database
+            self.connection.commit()
             self.disconnect()
     
     def delete_category(self, category_ID):
@@ -823,9 +836,8 @@ class MySQLDatabase:
         # Commit changes to the database
         self.connection.commit()
         
-        # Close cursor and connection
-        self.cursor.close()
-        self.connection.close()
+        # Disconnect function
+        self.disconnect()
 
     def execute_query(self, query):
         """Execute a SQL query.
@@ -839,10 +851,17 @@ class MySQLDatabase:
         # Connect to db
         self.connect()
         self.query = query
+
+        # Execute query
         self.cursor.execute(query)
         results = self.cursor.fetchone()
+
+        # Commit changes to the database
         self.connection.commit()
-        self.connection.close()
+        
+        # Disconnect function
+        self.disconnect()
+
         return results
   
 
@@ -851,10 +870,16 @@ class MySQLDatabase:
 
 
 
-db = MySQLDatabase("localhost","root","Mannheim", "zepp")
-habits = db.get_all_active_habits(1)
+# db = MySQLDatabase("localhost","root","Mannheim", "zepp")
+# query = "SELECT username FROM user_table WHERE user_ID = 1;"
+# habits = db.execute_query(query)
 
-print(habits)
+# query = "SELECT username FROM user_table WHERE user_ID = 2;"
+# habits1 = db.execute_query(query)
+
+
+# print(habits1)
+# print(habits)
 # db.create_table()
 # db.connect()
 

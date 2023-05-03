@@ -453,7 +453,6 @@ class main_screen(tk.Tk):
         self.active_habits_tree.heading("Remaining Time", text="Remaining Time", anchor="center")
         self.active_habits_tree.heading("Deadline", text="Deadline", anchor="w")
 
-
         # Get active user habits from the database using user_ID
         active_habits = self.db.get_active_habits(self.user_ID)
         # set a counter
@@ -561,8 +560,6 @@ class main_screen(tk.Tk):
         Returns:
             None.
         """
-
-        # Populate the treeview with data
 
         # Get active user habits from the database using user_ID
         active_habits = self.db.get_active_habits(self.user_ID)
@@ -705,7 +702,6 @@ class main_screen(tk.Tk):
         # Clear the treeview
         self.active_habits_tree.delete(*self.active_habits_tree.get_children())
 
-
         # Get active user habits from the database using user_ID
         active_habits = self.db.get_active_habits(self.user_ID)
         # set a counter
@@ -793,7 +789,6 @@ class main_screen(tk.Tk):
 
         # Schedule another call to this function after every second
         self.after(1000, self.update_active_habits_tree)
-
 
     def reactivate_active_habit(self):
         """
@@ -1192,7 +1187,6 @@ class main_screen(tk.Tk):
         user_ID = self.user_ID
         category_ID = self.db.get_category_ID(category_name, user_ID)
         system_user_ID = 99
-
             
         # Check if any of the variables are empty
         if not all([habit_name, description, category_ID]):
@@ -1210,7 +1204,6 @@ class main_screen(tk.Tk):
         if system_habit:
             messagebox.showerror("Error", "There is already a predefined habit with the same name in the database. Please choose a different name or use the existing habit.")
             return
-
 
         # Use User class to create a new user instance
         new_habit = Habit(habit_name, user_ID, description, category_ID)
@@ -1246,14 +1239,12 @@ class main_screen(tk.Tk):
         for item in selected_items:
             habit_ID = tree.item(item)["values"][5]
 
-        
         habit_name = self.db.check_value("habit_name", "habits", "habit_ID", habit_ID)
 
         # Create popup window
         popup_window = tk.Toplevel()
         popup_window.title(f"Activate Habit {habit_name}")
         popup_window.geometry('600x200')
-
 
         # Get user ID
         #username = os.getenv("User_Variables").split(',')[0]
@@ -1364,8 +1355,6 @@ class main_screen(tk.Tk):
             else:
                 messagebox.showerror("Error", "Your end date is in the past! Please try again")
                 popup_window.destroy()
-
-        
 
         save_button = tk.Button(popup_window, text='Save', command=lambda: save_activation(self))
         save_button.grid(column=0, row=3, pady=10, padx=10, columnspan=2)
