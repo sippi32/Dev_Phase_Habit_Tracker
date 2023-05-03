@@ -669,12 +669,15 @@ class main_screen(tk.Tk):
         # Loop through selected items and delete from database
         for item in selected_items:
             active_habit_name = self.active_habits_tree.item(item)["values"][0]
+            print(active_habit_name)
             user_ID = self.user_ID
+            print(user_ID)
             query = f"""UPDATE active_user_habits INNER JOIN habits ON active_user_habits.habit_ID = habits.habit_ID
                         SET status = 'deleted'
                         WHERE active_user_habits.user_ID = {user_ID} AND habits.habit_name = '{active_habit_name}';                       
                         """
             # Use execute query function to execute the query and set the status to 'deleted' in the database for this active habit. 
+            print(query)
             try:
                 self.db.execute_query(query)
                 messagebox.showinfo("Success","Habit not active any longer. Please update table.")

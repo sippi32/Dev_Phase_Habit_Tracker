@@ -854,7 +854,13 @@ class MySQLDatabase:
 
         # Execute query
         self.cursor.execute(query)
-        results = self.cursor.fetchone()
+        #results = self.cursor.fetchone()
+
+        # Check if there are results to fetch
+        if self.cursor.description is not None:
+            results = self.cursor.fetchone()
+        else:
+            results = "Query executed successfully"
 
         # Commit changes to the database
         self.connection.commit()
