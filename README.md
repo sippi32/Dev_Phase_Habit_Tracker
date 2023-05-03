@@ -8,6 +8,11 @@ The aim is to create a habit tracker that allows different users to track their 
 
 ![grafik](https://user-images.githubusercontent.com/131082327/235941616-b0fa93da-2a60-4e96-aebc-20e708c11474.png)
 
+Each of these existing sample accounts has already created and tracked their own Habits and existing Streaks. Please read the user guide below carefully to best understand the functionalities of the Habit Tracker. In addition to the Habits and categories created individually by the users, the Habit Tracker also comes with a number of predefined Habits and categories that users can choose from. 
+
+The users also have the possibility to analyse their habits in relation to existing streaks, records and the degree of achievement of self-set goals.
+In addition, there are various high scores where users can compare themselves with each other and thus motivate each other to continue actively tracking their habits. There is also a point system where users can earn points for existing streaks and thus move up in the high score.
+
 
 
 
