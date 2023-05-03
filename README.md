@@ -4,6 +4,8 @@
 Welcome to my very first application. A Habit Tracker. Creating this habit tracker was very, very challenging to me but I think that I have learned a lot during
 the process.  
 
+Created with Visual Studio Code, Python 3.11.1, MySQL Workbench and as GUI Tkinter.
+
 The aim is to create a habit tracker that allows different users to track their habits at different time intervals. New users can register and existing users can log in with their username and password. The following sample users with passwords can be used for testing purposes:
 
 ![grafik](https://user-images.githubusercontent.com/131082327/235941616-b0fa93da-2a60-4e96-aebc-20e708c11474.png)
@@ -14,10 +16,25 @@ The users also have the possibility to analyse their habits in relation to exist
 In addition, there are various high scores where users can compare themselves with each other and thus motivate each other to continue actively tracking their habits. There is also a point system where users can earn points for existing streaks and thus move up in the high score.
 
 
+## Installation 
 
+`pip install -r requirements.txt`
 
+contains required packages just like:
+
+datetime, mysql-connector-python, tk, tkcalendar, pandas, matplotlib
 
 ## 1. Usage
+
+Change the current working directory to the directory where your habit tracker files are located. For changing the directory use:
+
+`cd path`
+
+
+Start the application:
+
+`python main.py `
+
 
 The Habit Tracker allows multiple users to use the tracker. The Habit Tracker runs locally and needs a MySQL database to store the progress. At the first login or initialisation, the user is asked for the database connection. Please have information about host, username and password of the MySQL connection ready. Any name can be entered in the database field. If the database does not already exist, a new database will be created automatically and filled with sample data. The tables can be found in the file database_tables.text and the corresponding insert statements with the sample data can be found in inserts.txt. But as already mentioned, the database is created automatically. The next time you log in, simply enter the name of the existing database in the database field. In this case, the existing database will be used for further progress.
  
