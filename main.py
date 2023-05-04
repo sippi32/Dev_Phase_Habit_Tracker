@@ -264,7 +264,6 @@ class login_screen(tk.Tk):
         self.popup.title("Login")
         self.popup.grab_set() # Disables interaction with parent window
 
-
         username = tk.StringVar()
         password = tk.StringVar()
 
