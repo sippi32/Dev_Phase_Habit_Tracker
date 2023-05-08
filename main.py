@@ -313,7 +313,7 @@ class login_screen(tk.Tk):
             
             # disconnet from database, close popup and login screen and open the main window of the Habit Tracker
             self.db.disconnect()
-            print(os.getenv("active_user_ID"))
+            #print(os.getenv("active_user_ID"))
             self.popup.destroy()
             login_screen.destroy()
             self.open_main_screen()
