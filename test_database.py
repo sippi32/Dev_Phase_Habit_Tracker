@@ -183,9 +183,8 @@ class TestMySQLDatabase(unittest.TestCase):
         habit_name = "Sports"
 
         # Mock the expected SQL query and result
-        expected_query = f'''SELECT active_user_habits.habit_ID FROM active_user_habits
-                    INNER JOIN habits ON active_user_habits.habit_ID = habits.habit_ID
-                    WHERE habits.habit_name = '{habit_name}' AND (habits.user_ID = {user_ID} OR habits.user_ID = 99)
+        expected_query = f'''SELECT habit_ID FROM habits
+                WHERE habit_name = '{habit_name}' AND (user_ID = {user_ID} OR user_ID = 99);
                 '''
 
         self.db.cursor.fetchone.return_value = 2

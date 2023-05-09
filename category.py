@@ -11,6 +11,7 @@ class Category:
 
     Methods:
         __repr__: Returns a string representation of the category object.
+        create_dict: Returns a dictionary
     """
     def __init__(self, category_name, user_ID, description = None, creation_date = None):
         self.category_name = category_name
@@ -27,3 +28,20 @@ class Category:
         """
         return f"({self.category_name}, {self.user_ID},{self.creation_date}, {self.description})"       
         
+    # Function to create a dictionary with category attributes  
+    def create_dict(self):
+        category_name = self.category_name
+        user_ID = self.user_ID
+        creation_date = self.creation_date
+        description = self.description
+        
+        dict = {'category_name': category_name, 'user_ID': user_ID, 'creation_date': creation_date, 'description': description}
+
+        return dict
+
+
+
+
+# new_category1 = Category(category_name='new_test_category', user_ID=1, description='A test category')
+# dict = new_category1.create_dict()
+# print(dict)

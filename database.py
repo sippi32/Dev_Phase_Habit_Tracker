@@ -420,14 +420,11 @@ class MySQLDatabase:
         # Information about user and habit
         self.user_ID = user_ID
         self.habit_name = habit_name
-        
-        # Set table_name
-        table_name = 'habits'
+
         
         # Construct query for returning the habit_ID 
-        query = f'''SELECT active_user_habits.habit_ID FROM active_user_habits
-                    INNER JOIN habits ON active_user_habits.habit_ID = habits.habit_ID
-                    WHERE habits.habit_name = '{habit_name}' AND (habits.user_ID = {user_ID} OR habits.user_ID = 99)
+        query = f'''SELECT habit_ID FROM habits
+                WHERE habit_name = '{habit_name}' AND (user_ID = {user_ID} OR user_ID = 99);
                 '''
         
         # Execute query
@@ -876,7 +873,10 @@ class MySQLDatabase:
 
 
 
-# db = MySQLDatabase("localhost","root","Mannheim", "zepp")
+# db = MySQLDatabase("localhost","root","Mannheim", "zzz")
+# cat_ID = db.get_habit_ID(1, "asd")
+# print(cat_ID)
+
 # query = "SELECT username FROM user_table WHERE user_ID = 1;"
 # habits = db.execute_query(query)
 
