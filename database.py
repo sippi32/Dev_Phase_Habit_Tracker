@@ -874,6 +874,9 @@ class MySQLDatabase:
 
 
 # db = MySQLDatabase("localhost","root","Mannheim", "zzz")
+
+# list = db.check_value("update_expiry","active_user_habits","active_habits_ID",4)
+# print(list)
 # cat_ID = db.get_habit_ID(1, "asd")
 # print(cat_ID)
 

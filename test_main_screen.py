@@ -5,8 +5,8 @@ from unittest.mock import MagicMock
 from unittest.mock import patch
 from main import Main_screen
 from database import MySQLDatabase
-from datetime import datetime as dt
 from datetime import timedelta
+import datetime 
 import tkinter as tk
 from tkinter import ttk
 from habit import Habit
@@ -136,6 +136,55 @@ class TestMain(unittest.TestCase):
         mock_insert_data.assert_called_once_with('category', expected_data)
         mock_showinfo.assert_called_once_with("Success", "Category: {} successfully saved".format('new_test_category')) 
         mock_showerror.assert_not_called()
+
+    @mock.patch('tkinter.ttk.Treeview')
+    @mock.patch('tkinter.messagebox.showerror')
+    @mock.patch('tkinter.messagebox.showinfo')
+    @mock.patch.object(MySQLDatabase,'update_data')
+    @mock.patch.object(MySQLDatabase,'check_value')
+    @mock.patch.object(MySQLDatabase,'get_streak')
+    @mock.patch.object(MySQLDatabase,'get_active_habit_ID')
+    @mock.patch.object(MySQLDatabase,'get_habit_ID')
+    def test_check_daily_habit(self, mock_get_habit_ID, mock_get_active_habit_ID, mock_get_streak,mock_check_value,mock_update_data, mock_showinfo, mock_showerror,mock_treeview):
+        print(" Running test_check_daily_habit")
+
+        treeview_mock_object = mock.MagicMock(name="mock_treeview")
+        treeview_mock_object.selection.return_value =[("test_habit", 0, "daily", timedelta(hours=23))]
+        treeview_mock_object.item.return_value = {"values": ("test_habit", 0, "daily", timedelta(hours=23))}
+        
+        mock_main_screen = Main_screen(isTest=True)
+        mock_main_screen.db = self.db
+        mock_main_screen.active_habits_tree = treeview_mock_object
+
+        mock_main_screen.user_ID = 1
+
+        mock_get_habit_ID.return_value = (5,)
+        mock_get_active_habit_ID.return_value = 5
+        mock_get_streak.return_value = 0
+        mock_check_value.return_value = [(datetime.datetime.now(),)]
+        mock_check_value.return_value = [(datetime.datetime.now()+timedelta(hours=23),)]
+
+        expected_new_streak = 1
+        expected_new_update_expiry = datetime.datetime.now()+timedelta(hours=47)
+
+        expected_next_check = datetime.datetime.now()+timedelta(hours=23) -datetime.datetime.now()
+      
+
+
+        expected_data = {"streak": expected_new_streak,
+                                "last_check": datetime.datetime.now().replace(microsecond=0),
+                                "update_expiry": expected_new_update_expiry}
+
+        
+        mock_main_screen.check_habit()
+
+        # Assert statements for checking 1 active habit for the first time(streak=0 and daily habit
+        mock_update_data.assert_called_once_with("active_user_habits",expected_data,"active_habits", 5)
+        mock_showinfo.assert_called_once()
+        mock_showerror.assert_not_called()
+
+
+
 
 if __name__ == '__main__':
     unittest.main()

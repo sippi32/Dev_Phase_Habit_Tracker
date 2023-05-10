@@ -38,7 +38,7 @@ class Main_screen(tk.Tk):
     - update_active_habits_table: Updates the table of active habits with current data from the database
     - update_time: Updates the time label on the screen with the current time
     """
-
+    # init method of the Main_screen class. The isTest paramter is per default False and can be set to True for the purpose of testing single methods without mocking all GUI.
     def __init__(self, isTest=False):
         if not isTest:
             super().__init__()
@@ -572,108 +572,114 @@ class Main_screen(tk.Tk):
 
         # Loop through selected items and delete from database
         for item in selected_items:
-            # Store all needed values from the database to the corresponding variables
-            active_habit_name = self.active_habits_tree.item(item)["values"][0] # Get habit name from selected habit in tree
-            user_ID = self.user_ID  # Get user_ID from stored user_ID from the logged in user
-            habit_ID = int(self.db.get_habit_ID(user_ID, active_habit_name)[0]) # Get habit_ID from the habits table
-            active_habits_ID = self.db.get_active_habit_ID(user_ID,habit_ID,"in progress")
-            # Get current streak from treeview
-            streak = self.db.get_streak(active_habits_ID)
-            # Get last_check from database
-            last_check = self.db.check_value("last_check","active_user_habits","active_habits_ID",active_habits_ID)
-            # Get update_expiry from database
-            update_expiry = self.db.check_value("update_expiry","active_user_habits","active_habits_ID",active_habits_ID)
-            original_update_expiry = update_expiry[0][0] # Extracts the datetime object from list
-            # Get the monitoring interval of the habit
-            interval_ID = self.active_habits_tree.item(item)["values"][2] # Get interval_ID from selected active_user_habit
-            
-            # Convert the interval_ID from a string to a integer:
-            if interval_ID == "daily":
-                interval_ID = 1
-                # Calculate the new update_expiry
-                new_update_expiry = original_update_expiry + timedelta(days = 1)
-                # Calculate the time difference between the new_update expiry and the actual time 
-                time_diff = new_update_expiry - dt.now() 
-                # Calculate how much time is left until user can check this habit again
-                next_check = original_update_expiry - dt.now()
-                if streak == 0: # If streak is 0 the habit was activated same day.
-                    new_streak = streak +1
-                    data = {"streak": new_streak,
-                                "last_check": dt.now(),
-                                "update_expiry": new_update_expiry}
-                    self.db.update_data("active_user_habits", data, "active_habits", active_habits_ID)
-                    next_check = (new_update_expiry - timedelta(days=1)) - dt.now()
-                    messagebox.showinfo("Success",f"Congrats! You have checked you daily habit and you streak continoues. Your next check is available in {next_check}. Stay focused!")
-                elif next_check > timedelta(days = 1):
-                    next_check = (original_update_expiry - timedelta(days=1)) - dt.now()
-                    messagebox.showinfo("Info",f"This habit was already checked during this time period. You can check it again in {next_check}")
-                else:
-                    new_streak = streak +1
-                    data = {"streak": new_streak,
-                            "last_check": dt.now(),
-                            "update_expiry": new_update_expiry}
-                    next_check = (new_update_expiry - timedelta(days=1)) - dt.now()
-                    self.db.update_data("active_user_habits", data, "active_habits", active_habits_ID)
-                    messagebox.showinfo("Success",f"Congrats! You have checked you daily habit and you streak continoues. Your next check is available in {next_check}. Stay focused!")
-            # Check if interval = weekly
-            elif interval_ID == "weekly":
-                interval_ID = 2
-                # Calculate the new update_expiry
-                new_update_expiry = original_update_expiry + timedelta(days = 7)
-                # Calculate the time difference between the new_update expiry and the actual time 
-                time_diff = new_update_expiry - dt.now() 
-                # Calculate how much time is left until user can check this habit again
-                next_check = original_update_expiry - dt.now()
-                if streak == 0: # If streak is 0 the habit was activated same week.
-                    new_streak = streak +1
-                    data = {"streak": new_streak,
-                                "last_check": dt.now(),
-                                "update_expiry": new_update_expiry}
-                    self.db.update_data("active_user_habits", data, "active_habits", active_habits_ID)
-                    next_check = (new_update_expiry - timedelta(days=7)) - dt.now()
-                    messagebox.showinfo("Success",f"Congrats! You have checked you daily habit and you streak continoues. Your next check is available in {next_check}. Stay focused!")
-                elif next_check > timedelta(days = 7):
-                    next_check = (original_update_expiry - timedelta(days=7)) - dt.now()
-                    messagebox.showinfo("Info",f"This habit was already checked during this time period. You can check it again in {next_check}")
-                else:
-                    new_streak = streak +1
-                    data = {"streak": new_streak,
-                            "last_check": dt.now(),
-                            "update_expiry": new_update_expiry}
-                    next_check = (new_update_expiry - timedelta(days=7)) - dt.now()
-                    self.db.update_data("active_user_habits", data, "active_habits", active_habits_ID)
-                    messagebox.showinfo("Success",f"Congrats! You have checked you daily habit and you streak continoues. Your next check is available in {next_check}. Stay focused!")
-            # Check if time interval = monthly
-            elif interval_ID == "monthly":
-                interval_ID = 3
-                # Calculate the new update_expiry
-                new_update_expiry = original_update_expiry + timedelta(days = 30)
-                # Calculate the time difference between the new_update expiry and the actual time 
-                time_diff = new_update_expiry - dt.now() 
-                # Calculate how much time is left until user can check this habit again
-                next_check = original_update_expiry - dt.now()
-                if streak == 0: # If streak is 0 the habit was activated same month.
-                    new_streak = streak +1
-                    data = {"streak": new_streak,
-                                "last_check": dt.now(),
-                                "update_expiry": new_update_expiry}
-                    self.db.update_data("active_user_habits", data, "active_habits", active_habits_ID)
-                    next_check = (new_update_expiry - timedelta(days=30)) - dt.now()
-                    messagebox.showinfo("Success",f"Congrats! You have checked you daily habit and you streak continoues. Your next check is available in {next_check}. Stay focused!")
-                elif next_check > timedelta(days = 30):
-                    next_check = (original_update_expiry - timedelta(days=30)) - dt.now()
-                    messagebox.showinfo("Info",f"This habit was already checked during this time period. You can check it again in {next_check}")
-                else:
-                    new_streak = streak +1
-                    data = {"streak": new_streak,
-                            "last_check": dt.now(),
-                            "update_expiry": new_update_expiry}
-                    next_check = (new_update_expiry - timedelta(days=30)) - dt.now()
-                    self.db.update_data("active_user_habits", data, "active_habits", active_habits_ID)
-                    messagebox.showinfo("Success",f"Congrats! You have checked you daily habit and you streak continoues. Your next check is available in {next_check}. Stay focused!")
-                # Else print a error message for wrong time interval
+            # Get remaining time from treeview to check if time is up for checking            
+            remaining_time = self.active_habits_tree.item(item)["values"][3]
+            if remaining_time == "Time is up!":
+                messagebox.showerror("Error","You've failed to check your habit in time. You can start over again by Reactivate Habit or Delete Active Habit!")
+                return
             else:
-                messagebox.showerror("Error","There is something wrong with the Interval")
+                # Store all needed values from the database to the corresponding variables
+                active_habit_name = self.active_habits_tree.item(item)["values"][0] # Get habit name from selected habit in tree
+                user_ID = self.user_ID  # Get user_ID from stored user_ID from the logged in user
+                habit_ID = int(self.db.get_habit_ID(user_ID, active_habit_name)[0]) # Get habit_ID from the habits table  
+                active_habits_ID = self.db.get_active_habit_ID(user_ID,habit_ID,"in progress")
+                # Get current streak from treeview
+                streak = self.db.get_streak(active_habits_ID)
+                # Get last_check from database
+                last_check = self.db.check_value("last_check","active_user_habits","active_habits_ID",active_habits_ID)
+                # Get update_expiry from database
+                update_expiry = self.db.check_value("update_expiry","active_user_habits","active_habits_ID",active_habits_ID)
+                original_update_expiry = update_expiry[0][0] # Extracts the datetime object from list
+                # Get the monitoring interval of the habit
+                interval_ID = self.active_habits_tree.item(item)["values"][2] # Get interval_ID from selected active_user_habit
+
+                # Convert the interval_ID from a string to a integer and check the control interval:
+                if interval_ID == "daily":
+                    interval_ID = 1
+                    # Calculate the new update_expiry
+                    new_update_expiry = original_update_expiry + timedelta(days = 1)
+                    # Calculate the time difference between the new_update expiry and the actual time 
+                    time_diff = new_update_expiry - dt.now() 
+                    # Calculate how much time is left until user can check this habit again
+                    next_check = original_update_expiry - dt.now()
+                    if streak == 0: # If streak is 0 the habit was activated same day.
+                        new_streak = streak +1
+                        data = {"streak": new_streak,
+                                    "last_check": dt.now().replace(microsecond=0),
+                                    "update_expiry": new_update_expiry}
+                        self.db.update_data("active_user_habits", data, "active_habits", active_habits_ID)
+                        next_check = (new_update_expiry - timedelta(days=1)) - dt.now()
+                        messagebox.showinfo("Success",f"Congrats! You have checked you daily habit and you streak continoues. Your next check is available in {next_check}. Stay focused!")
+                    elif next_check > timedelta(days = 1):
+                        next_check = (original_update_expiry - timedelta(days=1)) - dt.now()
+                        messagebox.showinfo("Info",f"This habit was already checked during this time period. You can check it again in {next_check}")
+                    else:
+                        new_streak = streak +1
+                        data = {"streak": new_streak,
+                                "last_check": dt.now(),
+                                "update_expiry": new_update_expiry}
+                        next_check = (new_update_expiry - timedelta(days=1)) - dt.now()
+                        self.db.update_data("active_user_habits", data, "active_habits", active_habits_ID)
+                        messagebox.showinfo("Success",f"Congrats! You have checked you daily habit and you streak continoues. Your next check is available in {next_check}. Stay focused!")
+                # Check if interval = weekly
+                elif interval_ID == "weekly":
+                    interval_ID = 2
+                    # Calculate the new update_expiry
+                    new_update_expiry = original_update_expiry + timedelta(days = 7)
+                    # Calculate the time difference between the new_update expiry and the actual time 
+                    time_diff = new_update_expiry - dt.now() 
+                    # Calculate how much time is left until user can check this habit again
+                    next_check = original_update_expiry - dt.now()
+                    if streak == 0: # If streak is 0 the habit was activated same week.
+                        new_streak = streak +1
+                        data = {"streak": new_streak,
+                                    "last_check": dt.now(),
+                                    "update_expiry": new_update_expiry}
+                        self.db.update_data("active_user_habits", data, "active_habits", active_habits_ID)
+                        next_check = (new_update_expiry - timedelta(days=7)) - dt.now()
+                        messagebox.showinfo("Success",f"Congrats! You have checked you daily habit and you streak continoues. Your next check is available in {next_check}. Stay focused!")
+                    elif next_check > timedelta(days = 7):
+                        next_check = (original_update_expiry - timedelta(days=7)) - dt.now()
+                        messagebox.showinfo("Info",f"This habit was already checked during this time period. You can check it again in {next_check}")
+                    else:
+                        new_streak = streak +1
+                        data = {"streak": new_streak,
+                                "last_check": dt.now(),
+                                "update_expiry": new_update_expiry}
+                        next_check = (new_update_expiry - timedelta(days=7)) - dt.now()
+                        self.db.update_data("active_user_habits", data, "active_habits", active_habits_ID)
+                        messagebox.showinfo("Success",f"Congrats! You have checked you daily habit and you streak continoues. Your next check is available in {next_check}. Stay focused!")
+                # Check if time interval = monthly
+                elif interval_ID == "monthly":
+                    interval_ID = 3
+                    # Calculate the new update_expiry
+                    new_update_expiry = original_update_expiry + timedelta(days = 30)
+                    # Calculate the time difference between the new_update expiry and the actual time 
+                    time_diff = new_update_expiry - dt.now() 
+                    # Calculate how much time is left until user can check this habit again
+                    next_check = original_update_expiry - dt.now()
+                    if streak == 0: # If streak is 0 the habit was activated same month.
+                        new_streak = streak +1
+                        data = {"streak": new_streak,
+                                    "last_check": dt.now(),
+                                    "update_expiry": new_update_expiry}
+                        self.db.update_data("active_user_habits", data, "active_habits", active_habits_ID)
+                        next_check = (new_update_expiry - timedelta(days=30)) - dt.now()
+                        messagebox.showinfo("Success",f"Congrats! You have checked you daily habit and you streak continoues. Your next check is available in {next_check}. Stay focused!")
+                    elif next_check > timedelta(days = 30):
+                        next_check = (original_update_expiry - timedelta(days=30)) - dt.now()
+                        messagebox.showinfo("Info",f"This habit was already checked during this time period. You can check it again in {next_check}")
+                    else:
+                        new_streak = streak +1
+                        data = {"streak": new_streak,
+                                "last_check": dt.now(),
+                                "update_expiry": new_update_expiry}
+                        next_check = (new_update_expiry - timedelta(days=30)) - dt.now()
+                        self.db.update_data("active_user_habits", data, "active_habits", active_habits_ID)
+                        messagebox.showinfo("Success",f"Congrats! You have checked you daily habit and you streak continoues. Your next check is available in {next_check}. Stay focused!")
+                    # Else print a error message for wrong time interval
+                else:
+                    messagebox.showerror("Error","There is something wrong with the Interval")
 
     def update_time(self):
         """Function to update the time label on the bottom of the screen.
@@ -965,7 +971,6 @@ class Main_screen(tk.Tk):
         end_date_entry = tkcalendar.DateEntry(popup_window, width=12, textvariable=end_date_var, date_pattern='YYYY-MM-DD')
         end_date_entry.delete(0, "end") # Clears the calendar widget when open the window. So its empty as default
         end_date_entry.grid(column=1, row=2, pady=10, padx=10)
-
 
         # Create save button
         def save_activation(self):
