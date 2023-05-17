@@ -50,7 +50,7 @@ class Main_screen(tk.Tk):
             retrieved_var_string = os.getenv("Database_Variables")
             # Split the string back into separate variables
             retrieved_vars = retrieved_var_string.split(",")
-            self.db = MySQLDatabase(retrieved_vars[0],retrieved_vars[1],retrieved_vars[2], retrieved_vars[3])
+            self.db = MySQLDatabase(retrieved_vars[0],retrieved_vars[1],retrieved_vars[2], retrieved_vars[3], retrieved_vars[4])
 
             # Retrieve environment variable for the active user information
             retrieved_var_string = os.getenv("User_Variables")
@@ -1523,7 +1523,7 @@ class Main_screen(tk.Tk):
             df_plot = df_with_target[['habit_name', 'streak', 'target']]
 
             # Plot the current streak and target for each habit using a stacked bar chart
-            ax = df_plot.plot.bar(x='habit_name', stacked=True, rot=0)
+            ax = df_plot.plot.bar(x='habit_name', stacked=False, rot=0)
             ax.set_xlabel('Habit')
             ax.set_ylabel('Streak/Target')
             ax.set_title('Habit Streaks vs. Targets')

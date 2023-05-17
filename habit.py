@@ -39,10 +39,15 @@ class Habit:
         user_ID = self.user_ID
         category_ID = self.category_ID
         description = self.description
+        creation_date = self.creation_date
         
-        dict = {'habit_name': habit_name, 'user_ID': user_ID, 'category_ID': category_ID, 'description': description}
+        dict = {'habit_name': habit_name, 'user_ID': user_ID, 'category_ID': category_ID, 'description': description, 'creation_date': creation_date}
 
         return dict
+
+# new_habit = Habit("test",2,2)
+
+# print(repr(new_habit))
 
 
 

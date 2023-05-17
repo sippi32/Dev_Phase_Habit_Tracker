@@ -64,6 +64,12 @@ class database_connection_screen(tk.Tk):
         self.host_label.pack()
         self.entry_host = tk.Entry(self)
         self.entry_host.pack()
+
+        # Create the port label and entry widget
+        self.port_label = tk.Label(self, text="Port:")
+        self.port_label.pack()
+        self.entry_port = tk.Entry(self)
+        self.entry_port.pack()
         
         # Create the user label and entry widget
         self.user_label = tk.Label(self, text="User:")
@@ -108,21 +114,22 @@ class database_connection_screen(tk.Tk):
             None
         """  
         host = self.entry_host.get()
+        port = self.entry_port.get()
         user = self.entry_user.get()
         password = self.entry_password.get()
         database = self.entry_database.get()
 
-        db = MySQLDatabase(host,user,password)
+        db = MySQLDatabase(host,user,password,port)
         db.create_database(database)
 
         try:
-            db = mysql.connector.connect(host=host, user=user, password=password, database=database)
+            db = mysql.connector.connect(host=host, user=user, password=password, port=port, database=database)
             print("Connection successful!") # Test if database connection is successfull
         except mysql.connector.Error as err:
             print(f"Error connecting to database: {err}")
         finally:
             if db:
-                self.var_string = f"{host},{user},{password},{database}" # Concatenate database variables into a single string
+                self.var_string = f"{host},{user},{password},{port},{database}" # Concatenate database variables into a single string
                 os.environ["Database_Variables"] = self.var_string       # Set environment variable for later database connection
                 db.disconnect()
                 self.destroy() 
@@ -148,7 +155,7 @@ class login_screen(tk.Tk):
         retrieved_var_string = os.getenv("Database_Variables")
         # Split the string back into separate variables
         retrieved_vars = retrieved_var_string.split(",")
-        self.db = MySQLDatabase(retrieved_vars[0],retrieved_vars[1],retrieved_vars[2], retrieved_vars[3])
+        self.db = MySQLDatabase(retrieved_vars[0],retrieved_vars[1],retrieved_vars[2], retrieved_vars[3], retrieved_vars[4])
 
         tk.Label(text = "Login/Registration Habit Tracker", bg = "grey", width = "300", height = "2", font = ("Calibri", 13)).pack()
         tk.Label(text = "").pack()

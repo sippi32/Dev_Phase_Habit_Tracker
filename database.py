@@ -11,6 +11,7 @@ class MySQLDatabase:
         user (str): The username for the MySQL server.
         password (str): The password for the MySQL server.
         database (Optional[str]): The name of the MySQL database to use.
+        port (Optional[int], Default value 3306): The port of the database connection. 3306 is the  is the default port for the classic MySQL protocol ( port ), which is used by the mysql client, MySQL Connector.
 
     Methods:
         __init__: Initializes the MySQLDatabase object.
@@ -40,7 +41,7 @@ class MySQLDatabase:
         delete_category: Deletes a category for a given user from the MySQL database.
         execute_query: Executes a custom SQL query on the MySQL database.
     """
-    def __init__(self, host, user, password, database = None):
+    def __init__(self, host, user, password, port=3306, database = None):
         """
         Initializes a new MySQLDatabase object.
 
@@ -48,11 +49,13 @@ class MySQLDatabase:
             host (str): The hostname of the MySQL server.
             user (str): The username for the MySQL server.
             password (str): The password for the MySQL server.
+            port (Optional[int]): Per Default set to 3306. Can be changed if antoher port is used.
             database (Optional[str]): The name of the MySQL database to use.
         """
         self.host = host
         self.user = user
         self.password = password
+        self.port = port
         self.database = database
         self.connection = None
         self.cursor = None
@@ -69,6 +72,7 @@ class MySQLDatabase:
             host = self.host,
             user = self.user,
             password = self.password,
+            port = self.port,
             database = self.database
             )
         except Exception as e: 
@@ -103,13 +107,40 @@ class MySQLDatabase:
         Raises:
             Exception: If there is an error while connecting to the database or initializing it.
         """
+        # try:
+        #     self.connect()
+        #     self.cursor.execute(f"CREATE DATABASE IF NOT EXISTS {new_database}")
+        #     self.database = new_database
+
+        #     if self.cursor.statement.endswith('1'):  # Check if CREATE DATABASE statement was executed
+        #         self.initialize_database(self.database)  # Call database initialization function if a new database was created
+        #         messagebox.showinfo("Success", "Database created. You can go on and login/register.")
+        #     else:
+        #         messagebox.showinfo("Info", "Database already exists.")  # Show info message if the database already exists
+
+        # finally:
+        #     self.disconnect()
         try:
             self.connect()
-            self.cursor.execute(f"CREATE DATABASE IF NOT EXISTS {new_database}")
+            self.cursor.execute(f"CREATE DATABASE {new_database}")
             self.database = new_database
-            if self.cursor.rowcount == 1:
-                self.initialize_database(self.database) # Call database initialization function if a new database was created
+            print(self.cursor.rowcount)
+            if self.cursor.rowcount >= 0:
+                # New database created
+                self.initialize_database(self.database)
                 messagebox.showinfo("Success", "Database created. You can go on and login/register.")
+            else:
+                # Database already exists
+                messagebox.showinfo("Info", "Database already exists.")
+
+        except mysql.connector.Error as err:
+            if err.errno == 1007:
+                # Database already exists
+                messagebox.showinfo("Info", "Database already exists, you can now login or register.")
+            else:
+                # Other error occurred during database creation
+                messagebox.showerror("Error", f"Database creation failed: {err}")
+
         finally:
             self.disconnect()
 
@@ -873,7 +904,8 @@ class MySQLDatabase:
 
 
 
-# db = MySQLDatabase("localhost","root","Mannheim", "zzz")
+# db = MySQLDatabase("localhost","root","Mannheim", 3307, "world")
+# db.connect()
 
 # list = db.check_value("update_expiry","active_user_habits","active_habits_ID",4)
 # print(list)
