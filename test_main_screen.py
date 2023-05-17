@@ -18,21 +18,19 @@ class TestMain(unittest.TestCase):
         self.db = MySQLDatabase('localhost','root','test')
         self.db.cursor = mock.MagicMock()
         self.db.connection = mock.MagicMock()
-        #self.mock_selection = mock.MagicMock()
-        # self.main_screen = Main_screen(isTest=True)
-        # self.main_screen.user_ID = 1
-        #self.main_screen.active_habits_tree = MagicMock()
+
 
     def tearDown(self):
         print("Running tear down method")
 
+    @mock.patch.object(Habit,'create_dict')
     @mock.patch.object(MySQLDatabase,'insert_data')
     @mock.patch.object(MySQLDatabase,'get_category_ID')
     @mock.patch.object(MySQLDatabase,'get_habit_ID')
     @mock.patch('tkinter.messagebox.showerror')
     @mock.patch('tkinter.messagebox.showinfo')
     @mock.patch('tkinter.Tk') 
-    def test_save_habit_one_added(self, mock_tk, mock_showinfo, mock_showerror, mock_get_habit_ID, mock_get_category_ID, mock_insert_data):
+    def test_save_habit_one_added(self, mock_tk, mock_showinfo, mock_showerror, mock_get_habit_ID, mock_get_category_ID, mock_insert_data, mock_create_dict):
         print(" Running test_save_habit_one_added")
         
         mock_popup_instance = mock_tk.return_value
@@ -51,11 +49,14 @@ class TestMain(unittest.TestCase):
         mock_main_screen.entry_description.get.return_value = 'A test habit'
         mock_main_screen.category_var.get.return_value = 'Test category'
 
+        mock_creation_date = '2023-05-17T00:00:00.00000'
+
         mock_main_screen.category_ID = 1
         mock_get_category_ID.return_value = 1
         mock_get_habit_ID.return_value = None
+        mock_create_dict.return_value = {'habit_name': 'new_test_habit', 'user_ID': 1, 'category_ID': 1, 'description': 'A test habit', 'creation_date': mock_creation_date}
 
-        expected_data = {'habit_name': 'new_test_habit', 'user_ID': 1, 'category_ID': 1, 'description': 'A test habit'}
+        expected_data = {'habit_name': 'new_test_habit', 'user_ID': 1, 'category_ID': 1, 'description': 'A test habit', 'creation_date': mock_creation_date}
         
         mock_main_screen.save_habit()
 

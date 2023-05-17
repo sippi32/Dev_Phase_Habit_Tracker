@@ -37,12 +37,14 @@ class TestMain(unittest.TestCase):
         # create mock Entry widgets
         db_screen.entry_host = Mock()
         db_screen.entry_user = Mock()
+        db_screen.entry_port = Mock()
         db_screen.entry_password = Mock()
         db_screen.entry_database = Mock()
 
         # configure mock Entry widgets to return desired values when get() is called
         db_screen.entry_host.get.return_value = 'testhost'
         db_screen.entry_user.get.return_value = 'testuser'
+        db_screen.entry_port.get.return_value = 3306
         db_screen.entry_password.get.return_value = 'testpass'
         db_screen.entry_database.get.return_value = 'testdb'
 
@@ -53,9 +55,9 @@ class TestMain(unittest.TestCase):
         db_screen.confirm_values()
 
         # assert that the database connection was created successfully
-        mock_MySQLDatabase.assert_called_once_with('testhost', 'testuser', 'testpass')
+        mock_MySQLDatabase.assert_called_once_with('testhost', 'testuser', 'testpass', 3306 )
         mock_db_instance.create_database.assert_called_once_with('testdb')
-        mock_connect.assert_called_once_with(host='testhost', user='testuser', password='testpass', database='testdb')
+        mock_connect.assert_called_once_with(host='testhost', user='testuser',port=3306, password='testpass', database='testdb')
         mock_open_next_window.assert_called_once()
 
     @mock.patch.object(MySQLDatabase, 'connect')
