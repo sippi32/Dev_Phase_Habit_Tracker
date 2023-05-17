@@ -38,6 +38,10 @@ Start the application:
 
 `python main.py `
 
+Simple Start:
+
+It's also possible to start the application by using the start.bat file which first changes the working directory to the folder where the Habit Tracker is located in, the executes the installation of the requirements.txt and then starts the application calling python main.py
+
 
 The Habit Tracker allows multiple users to use the tracker. The Habit Tracker runs locally and needs a MySQL database to store the progress. At the first login or initialisation, the user is asked for the database connection. Please have information about host, username and password of the MySQL connection ready. Any name can be entered in the database field. If the database does not already exist, a new database will be created automatically and filled with sample data. The tables can be found in the file database_tables.text and the corresponding insert statements with the sample data can be found in inserts.txt. But as already mentioned, the database is created automatically. The next time you log in, simply enter the name of the existing database in the database field. In this case, the existing database will be used for further progress.
 
@@ -48,12 +52,14 @@ The Habit Tracker allows multiple users to use the tracker. The Habit Tracker ru
 ## 2.1.	Database Connection Screen
 
 -	The first screen when starting the habit tracker is the Database Connection screen (class database_connection_screen, main.py)
--	User has to enter the MySQL Database credentials host/user/password and set a name for a new database. If it’s the first login and the database wasn’t created before the database gets created (class MySQLDatabase, def create_database, def_initialize_database, database.py and inserts from inserts.txt)
--	When the database is created, the database information is also stored as an environmental variable for later use.
+-	User has to enter the MySQL Database credentials host/user/password/port and set a name for a new database. If it’s the first login and the database wasn’t created before the database gets created (class MySQLDatabase, def create_database, def_initialize_database, database.py and inserts from inserts.txt)
+-	When the database is created, the database information is also stored as an environmental variable for later use during the active session.
 -	The initialisation of the database takes approx. 20 seconds, as waiting times between the individual queries have been built in for safety's sake in order not to overload the database.
 
-![grafik](https://user-images.githubusercontent.com/131082327/235931545-91a258d2-6b94-412a-a033-7d7206113553.png)
-![grafik](https://user-images.githubusercontent.com/131082327/235931590-2e10f0ec-0384-48b4-9fe0-194726f2e5db.png)
+
+![image](https://github.com/sippi32/Fin_Phase_Habit_Tracker/assets/131082327/942c3127-2a0f-4440-9eaa-39f358f650ea)
+![image](https://github.com/sippi32/Fin_Phase_Habit_Tracker/assets/131082327/07601239-d0c4-47a3-970e-2c1863a9d05b)
+
   
 -	If a user enters incorrect database credentials, an error message is displayed
 
