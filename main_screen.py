@@ -1194,7 +1194,6 @@ class Main_screen(tk.Tk):
 
         self.add_cat_pop.wait_window() # Wait for popup window to be destroyed
 
-
     def save_category(self):     
         """
         Save the new category entered by the user to the database using insert_data function

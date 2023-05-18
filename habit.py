@@ -45,9 +45,6 @@ class Habit:
 
         return dict
 
-# new_habit = Habit("test",2,2)
-
-# print(repr(new_habit))
 
 
 

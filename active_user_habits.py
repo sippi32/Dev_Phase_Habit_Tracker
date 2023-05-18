@@ -13,7 +13,7 @@ class ActiveUserHabit:
         update_expiry (datetime): The date and time when the user's habit streak will expire if they do not check it off.
         streak (int): The number of consecutive days/weeks/months the user has checked off the habit.
         status (str): The current status of the habit ('in progress', 'completed', or 'failed').
-        goal_streak (int): The number of consecutive days/weeks/months the user is aiming to check off the habit.
+        goal_streak (int): The number of consecutive days/ weeks/ months the user is aiming to check off the habit.
         end_date (datetime): The date and time when the user plans to stop tracking the habit.
     """
     def __init__(self, user_ID, habit_ID, interval_ID, goal_streak=None, end_date=None, last_check=None, update_expiry=None):

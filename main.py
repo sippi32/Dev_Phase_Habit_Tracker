@@ -291,7 +291,6 @@ class login_screen(tk.Tk):
         # Wait for popup window to be destroyed     
         self.popup.wait_window()
 
-
     def login_process(self):
         """
         Processes the user inputs from the login screen, checks if the user exists in the database, and if so, sets environment variables for the active user credentials and opens the main screen of the Habit Tracker.

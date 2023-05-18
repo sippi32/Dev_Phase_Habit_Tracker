@@ -26,9 +26,9 @@ class User:
 
             Args:
                 new_first_name (str, optional): The user's new first name.
-                new_last_name (str, optional): The user's new last name.
+                new_last_name (str,optional): The user's new last name.
                 new_username (str, optional): The user's new username.
-                new_password (str, optional): The user's new password.
+                new_password (str, optional): The user's new pasword.
                 new_email (str, optional): The user's new email address.
                 new_phone_number (str, optional): The user's new phone number.
 
@@ -47,7 +47,6 @@ class User:
 
     def __repr__(self):
         return f"User username = {self.username}, first_name = {self.first_name}, last_name = {self.last_name}, password = {self.password}, email = {self.email}, phone_number = {self.phone_number}, created_time = {self.created_time}, last_update = {self.last_update})"
-
 
     def update_profile(self, new_first_name=None, new_last_name=None, new_username=None, new_password=None, new_email=None, new_phone_number=None):
         if new_first_name:

@@ -170,8 +170,6 @@ class TestMain(unittest.TestCase):
 
         expected_next_check = datetime.datetime.now()+timedelta(hours=23) -datetime.datetime.now()
       
-
-
         expected_data = {"streak": expected_new_streak,
                                 "last_check": datetime.datetime.now().replace(microsecond=0),
                                 "update_expiry": expected_new_update_expiry}
@@ -183,8 +181,6 @@ class TestMain(unittest.TestCase):
         mock_update_data.assert_called_once_with("active_user_habits",expected_data,"active_habits", 5)
         mock_showinfo.assert_called_once()
         mock_showerror.assert_not_called()
-
-
 
 
 if __name__ == '__main__':

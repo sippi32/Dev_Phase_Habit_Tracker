@@ -556,11 +556,6 @@ class TestMySQLDatabase(unittest.TestCase):
         self.assertEqual(return_value, expected_return)
         mock_disconnect.assert_called_once()    
 
-
-    
-
-
-
     if __name__ == '__main__':
         unittest.main()
 

@@ -107,19 +107,6 @@ class MySQLDatabase:
         Raises:
             Exception: If there is an error while connecting to the database or initializing it.
         """
-        # try:
-        #     self.connect()
-        #     self.cursor.execute(f"CREATE DATABASE IF NOT EXISTS {new_database}")
-        #     self.database = new_database
-
-        #     if self.cursor.statement.endswith('1'):  # Check if CREATE DATABASE statement was executed
-        #         self.initialize_database(self.database)  # Call database initialization function if a new database was created
-        #         messagebox.showinfo("Success", "Database created. You can go on and login/register.")
-        #     else:
-        #         messagebox.showinfo("Info", "Database already exists.")  # Show info message if the database already exists
-
-        # finally:
-        #     self.disconnect()
         try:
             self.connect()
             self.cursor.execute(f"CREATE DATABASE {new_database}")
@@ -898,75 +885,3 @@ class MySQLDatabase:
 
         return results
   
-
-
-
-
-
-
-# db = MySQLDatabase("localhost","root","Mannheim", 3307, "world")
-# db.connect()
-
-# list = db.check_value("update_expiry","active_user_habits","active_habits_ID",4)
-# print(list)
-# cat_ID = db.get_habit_ID(1, "asd")
-# print(cat_ID)
-
-# query = "SELECT username FROM user_table WHERE user_ID = 1;"
-# habits = db.execute_query(query)
-
-# query = "SELECT username FROM user_table WHERE user_ID = 2;"
-# habits1 = db.execute_query(query)
-
-
-# print(habits1)
-# print(habits)
-# db.create_table()
-# db.connect()
-
-
-
-# db.create_database_tables("lulu")
-
-
-
-
-
-
-
-#insert = "INSERT INTO user_table (user_ID, first_name, last_name, username, password, email, phone_number, created_time, last_update) VALUES (67, 'Heinz', 'Huber', 'lui', 'hubinho', 'heinz.huber@web.de', '01768907654', '2023-03-15 10:00:00', '2023-03-20 11:05:00');"
-#db.cursor.execute(insert)
-# db.connection.commit()
-
-# #sys_habits = db.get_user_habits(99)
-# all_active = db.get_global_active_habits(3)
-# print(all_active)
-
-
-#db.connect()
-# db.initialize_database("test")
-# result = db.get_all_active_habits(2)
-# print(result)
-# db.get_habit_ID(2,'Soccer')
-
-# db.get_category_ID("Meditation",99)
-
-# #db.delete_habit(2)
-# db.get_category_ID("sport",2)
-
-
-
-  
-
-    
-
-
-    
-
-
-
-
-
-
-
-

@@ -98,8 +98,6 @@ class TestMain(unittest.TestCase):
         mock_show_info.assert_called_once_with("Success", "User: MAFI successfully registered")
         mock_popup_instance.destroy.assert_called_once()
     
-
-
 if __name__ == '__main__':
     unittest.main()
     

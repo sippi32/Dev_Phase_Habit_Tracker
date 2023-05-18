@@ -39,9 +39,3 @@ class Category:
 
         return dict
 
-
-
-
-# new_category1 = Category(category_name='new_test_category', user_ID=1, description='A test category')
-# dict = new_category1.create_dict()
-# print(dict)
