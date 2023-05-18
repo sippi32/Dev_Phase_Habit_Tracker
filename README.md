@@ -15,9 +15,10 @@ In addition, there are various high scores where users can compare themselves wi
 
 It is important to say that the Habit Tracker requires a MySQL connection. At the first start, the user is asked for this connection (host/username/password) and must also enter a name for the database/schema. This name can be freely chosen. For example habit_tracekr_db. After the connection has been successfully established, the database and its required tables are created. The SQL statements are located in database_tables.txt. Furthermore, the database is filled with predefined habits, categories and already existing example users (inserts.txt). These sample users already have existing track records and can be used for testing purposes. The next time the Habits Tracker is used, the existing database connection and database can then simply be entered and subsequently used.
 
-The following picture contains the **Logins** with usernames and passwords for the example users after the Database was successfully initialised. 
+The following picture contains the **Logins** with usernames and passwords for the example users after the Database was successfully initialised. It is recommende to use **username: test_user password: test** for testing functionalities with a test-user.
 
-![grafik](https://user-images.githubusercontent.com/131082327/235941616-b0fa93da-2a60-4e96-aebc-20e708c11474.png)
+![image](https://github.com/sippi32/Fin_Phase_Habit_Tracker/assets/131082327/9a27fe2b-1474-4588-8dd7-7736506ebbe2)
+
 
 ## Installation 
 
@@ -43,7 +44,17 @@ Start the application:
 It's also possible to start the application by using the **start.bat** file which first changes the working directory to the folder where the Habit Tracker is located in, the executes the installation of the requirements.txt and then starts the application calling python main.py
 
 
-The Habit Tracker allows multiple users to use the tracker. The Habit Tracker runs locally and needs a MySQL database to store the progress. At the first login or initialisation, the user is asked for the database connection. Please have information about host, username and password of the MySQL connection ready. Any name can be entered in the database field. If the database does not already exist, a new database will be created automatically and filled with sample data. The tables can be found in the file database_tables.text and the corresponding insert statements with the sample data can be found in inserts.txt. But as already mentioned, the database is created automatically. The next time you log in, simply enter the name of the existing database in the database field. In this case, the existing database will be used for further progress.
+The Habit Tracker allows multiple users to use the tracker. The Habit Tracker runs locally and needs a MySQL database to store the progress. At the first login or initialisation, the user is asked for the database connection. Please have information about host, port, username and password of the MySQL connection ready. Any name can be entered in the database field. If the database does not already exist, a new database will be created automatically and filled with sample data. The tables can be found in the file database_tables.text and the corresponding insert statements with the sample data can be found in inserts.txt. But as already mentioned, the database is created automatically. The next time you log in, simply enter the name of the existing database in the database field. In this case, the existing database will be used for further progress.
+
+## Unittest
+
+implemented with unittest last unittest on 2023-05-18 ---0 tests failed, 25 passed---
+
+To start the unittest execute while in the folder (as working directory) where the codes is located:
+
+`python -m unittest discover`
+
+The main focus of the unittest are the database methods located in database.py and the core functionalities of the habit tracker, just like checking a habit.
 
  
 ## 2. Database Connection and User Login/Registration
